@@ -18,7 +18,148 @@
   <!-- PWA Icons (inline SVG as data URI) -->
   <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='120' fill='%230e1420'/%3E%3Ccircle cx='256' cy='256' r='180' fill='none' stroke='%235ecfaa' stroke-width='24'/%3E%3Ctext x='256' y='310' text-anchor='middle' font-size='180' font-family='Arial' fill='%235ecfaa'%3E%E2%82%B1%3C/text%3E%3C/svg%3E">
 
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+  /* Embedded font fallback - works fully offline */
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+  /* ══ SYNC & SHARED FEATURES ══ */
+  .sync-bar {
+    position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 420px;
+    background: var(--accent); color: #0e1420;
+    padding: 8px 16px; z-index: 999;
+    display: none; align-items: center; justify-content: center;
+    gap: 8px; font-size: 12px; font-weight: 900;
+    font-family: 'Nunito', sans-serif;
+  }
+  .sync-bar.show { display: flex; }
+  .sync-bar.error { background: var(--accent4); color: #fff; }
+  .sync-bar.syncing { background: var(--accent3); }
+
+  .user-toggle {
+    display: flex; gap: 6px; margin-bottom: 14px;
+  }
+  .user-btn {
+    flex: 1; padding: 9px; border-radius: 14px;
+    background: var(--surface2); border: 2px solid transparent;
+    font-size: 12px; font-weight: 900; color: var(--muted2);
+    cursor: pointer; text-align: center; transition: all 0.2s;
+    font-family: 'Nunito', sans-serif;
+  }
+  .user-btn.active-cha     { border-color: var(--accent);  background: rgba(94,207,170,0.12); color: var(--accent); }
+  .user-btn.active-chad { border-color: var(--accent2); background: rgba(107,163,214,0.12); color: var(--accent2); }
+
+  .setup-modal {
+    position: fixed; inset: 0; z-index: 600;
+    background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+    display: none; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .setup-modal.show { display: flex; }
+  .setup-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 28px; padding: 28px 24px; width: 100%; max-width: 380px;
+  }
+  .setup-box h2 { font-size: 20px; font-weight: 900; margin-bottom: 6px; color: var(--text); }
+  .setup-box p  { font-size: 13px; color: var(--muted2); margin-bottom: 20px; line-height: 1.5; }
+
+  /* Combined summary card */
+  .combined-card {
+    background: linear-gradient(135deg, var(--surface), var(--surface2));
+    border: 1px solid var(--accent2);
+    border-radius: 24px; padding: 18px;
+    margin-bottom: 16px;
+  }
+  .combined-title { font-size: 11px; font-weight: 900; color: var(--muted2);
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
+  .combined-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .combined-person {
+    flex: 1; background: var(--surface2); border-radius: 16px; padding: 12px;
+    text-align: center;
+  }
+  .cp-name { font-size: 10px; font-weight: 900; text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 6px; }
+  .cp-amount { font-size: 18px; font-weight: 900; }
+  .combined-total {
+    background: var(--surface2); border-radius: 16px; padding: 12px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .ct-label { font-size: 12px; font-weight: 700; color: var(--muted2); }
+  .ct-val { font-size: 16px; font-weight: 900; }
+
+</style>
+<style>
+  /* Offline fallback in case Google Fonts fails */
+  :root {
+    --font: 'Nunito', 'Varela Round', 'Comic Sans MS', system-ui, -apple-system, sans-serif;
+  }
+
+  /* ══ SYNC & SHARED FEATURES ══ */
+  .sync-bar {
+    position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 420px;
+    background: var(--accent); color: #0e1420;
+    padding: 8px 16px; z-index: 999;
+    display: none; align-items: center; justify-content: center;
+    gap: 8px; font-size: 12px; font-weight: 900;
+    font-family: 'Nunito', sans-serif;
+  }
+  .sync-bar.show { display: flex; }
+  .sync-bar.error { background: var(--accent4); color: #fff; }
+  .sync-bar.syncing { background: var(--accent3); }
+
+  .user-toggle {
+    display: flex; gap: 6px; margin-bottom: 14px;
+  }
+  .user-btn {
+    flex: 1; padding: 9px; border-radius: 14px;
+    background: var(--surface2); border: 2px solid transparent;
+    font-size: 12px; font-weight: 900; color: var(--muted2);
+    cursor: pointer; text-align: center; transition: all 0.2s;
+    font-family: 'Nunito', sans-serif;
+  }
+  .user-btn.active-cha     { border-color: var(--accent);  background: rgba(94,207,170,0.12); color: var(--accent); }
+  .user-btn.active-chad { border-color: var(--accent2); background: rgba(107,163,214,0.12); color: var(--accent2); }
+
+  .setup-modal {
+    position: fixed; inset: 0; z-index: 600;
+    background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+    display: none; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .setup-modal.show { display: flex; }
+  .setup-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 28px; padding: 28px 24px; width: 100%; max-width: 380px;
+  }
+  .setup-box h2 { font-size: 20px; font-weight: 900; margin-bottom: 6px; color: var(--text); }
+  .setup-box p  { font-size: 13px; color: var(--muted2); margin-bottom: 20px; line-height: 1.5; }
+
+  /* Combined summary card */
+  .combined-card {
+    background: linear-gradient(135deg, var(--surface), var(--surface2));
+    border: 1px solid var(--accent2);
+    border-radius: 24px; padding: 18px;
+    margin-bottom: 16px;
+  }
+  .combined-title { font-size: 11px; font-weight: 900; color: var(--muted2);
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
+  .combined-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .combined-person {
+    flex: 1; background: var(--surface2); border-radius: 16px; padding: 12px;
+    text-align: center;
+  }
+  .cp-name { font-size: 10px; font-weight: 900; text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 6px; }
+  .cp-amount { font-size: 18px; font-weight: 900; }
+  .combined-total {
+    background: var(--surface2); border-radius: 16px; padding: 12px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .ct-label { font-size: 12px; font-weight: 700; color: var(--muted2); }
+  .ct-val { font-size: 16px; font-weight: 900; }
+
+</style>
 <style>
   /* ── THEME: Dark Teal (default) ── */
   :root {
@@ -105,7 +246,7 @@
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
   body {
-    font-family: 'Nunito', sans-serif;
+    font-family: var(--font);
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
@@ -275,7 +416,7 @@
   }
 
   .net-amount {
-    font-family: 'Nunito', sans-serif; font-weight: 800; letter-spacing: -0.3px;
+    font-family: var(--font); font-weight: 800; letter-spacing: -0.3px;
     font-size: 34px;
     font-weight: 500;
     color: var(--accent);
@@ -316,7 +457,7 @@
   }
 
   .net-meta-val {
-    font-family: 'Nunito', sans-serif; font-weight: 800; letter-spacing: -0.3px;
+    font-family: var(--font); font-weight: 800; letter-spacing: -0.3px;
     font-size: 15px;
     font-weight: 500;
   }
@@ -394,7 +535,7 @@
   }
 
   .module-value {
-    font-family: 'Nunito', sans-serif; font-weight: 800; letter-spacing: -0.3px;
+    font-family: var(--font); font-weight: 800; letter-spacing: -0.3px;
     font-size: 18px;
     font-weight: 500;
     margin-bottom: 6px;
@@ -469,7 +610,7 @@
   }
 
   .alert-date {
-    font-family: 'Nunito', sans-serif; font-weight: 800; letter-spacing: -0.3px;
+    font-family: var(--font); font-weight: 800; letter-spacing: -0.3px;
     font-size: 11px;
     color: var(--muted);
     white-space: nowrap;
@@ -492,7 +633,7 @@
     text-align: center;
     cursor: pointer;
     transition: all 0.2s;
-    font-family: 'Nunito', sans-serif;
+    font-family: var(--font);
   }
 
   .quick-btn:active { transform: scale(0.95); background: var(--surface2); }
@@ -534,7 +675,7 @@
 
   .tx-right { text-align: right; }
   .tx-amount {
-    font-family: 'Nunito', sans-serif; font-weight: 800; letter-spacing: -0.3px;
+    font-family: var(--font); font-weight: 800; letter-spacing: -0.3px;
     font-size: 14px;
     font-weight: 500;
     margin-bottom: 2px;
@@ -903,7 +1044,7 @@
     background: var(--surface); border: 1px solid var(--border);
     font-size: 12px; font-weight: 700; color: var(--muted2);
     cursor: pointer; white-space: nowrap; transition: all 0.2s;
-    font-family: 'Nunito', sans-serif;
+    font-family: var(--font);
   }
   .ftab.active {
     background: var(--accent); color: #0e1420;
@@ -984,7 +1125,7 @@
     padding: 5px 12px; border-radius: 12px;
     font-size: 11px; font-weight: 800;
     cursor: pointer; transition: all 0.2s;
-    font-family: 'Nunito', sans-serif; border: none;
+    font-family: var(--font); border: none;
   }
   .dact-btn:active { transform: scale(0.93); }
   .dact-pay { background: var(--accent); color: #0e1420; }
@@ -1051,7 +1192,7 @@
     width: 100%; padding: 12px 14px;
     background: var(--surface2); border: 1px solid var(--border);
     border-radius: 14px; color: var(--text);
-    font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600;
+    font-family: var(--font); font-size: 14px; font-weight: 600;
     outline: none; transition: border-color 0.2s;
   }
   .field-input:focus { border-color: var(--accent); }
@@ -1061,7 +1202,7 @@
     width: 100%; padding: 14px;
     background: var(--accent); color: #0e1420;
     border: none; border-radius: 16px;
-    font-family: 'Nunito', sans-serif;
+    font-family: var(--font);
     font-size: 15px; font-weight: 900;
     cursor: pointer; transition: all 0.2s; margin-top: 4px;
   }
@@ -1149,7 +1290,7 @@
     color: var(--accent4); font-size: 14px;
     cursor: pointer; display: flex; align-items: center;
     justify-content: center; transition: all 0.2s;
-    font-family: 'Nunito', sans-serif; flex-shrink: 0;
+    font-family: var(--font); flex-shrink: 0;
   }
   .exp-delete:active { transform: scale(0.88); background: rgba(224,123,138,0.25); }
 
@@ -1257,7 +1398,7 @@
   .hact-btn {
     padding: 7px 14px; border-radius: 12px;
     font-size: 12px; font-weight: 900;
-    cursor: pointer; border: none; font-family: 'Nunito', sans-serif;
+    cursor: pointer; border: none; font-family: var(--font);
     transition: all 0.2s;
   }
   .hact-btn:active { transform: scale(0.92); }
@@ -1362,7 +1503,7 @@
   .hact-btn {
     padding: 7px 14px; border-radius: 12px;
     font-size: 12px; font-weight: 900;
-    cursor: pointer; border: none; font-family: 'Nunito', sans-serif;
+    cursor: pointer; border: none; font-family: var(--font);
     transition: all 0.2s;
   }
   .hact-btn:active { transform: scale(0.92); }
@@ -1499,7 +1640,7 @@
     padding: 5px 12px; border-radius: 10px;
     background: var(--accent); color: #0e1420;
     font-size: 11px; font-weight: 900; border: none;
-    cursor: pointer; font-family: 'Nunito', sans-serif;
+    cursor: pointer; font-family: var(--font);
     transition: all 0.2s;
   }
   .sg-add-btn:active { transform: scale(0.92); }
@@ -1518,218 +1659,71 @@
   .itt-opt:active { transform: scale(0.93); }
 
 
-  /* ══════════════════════════════
-     FAMILY BUDGET SCREEN
-  ══════════════════════════════ */
-  .budget-hero {
-    background: linear-gradient(135deg, var(--surface), var(--surface2));
-    border: 1px solid var(--border);
-    border-radius: 24px; padding: 20px;
-    margin-bottom: 16px; position: relative; overflow: hidden;
-  }
-  .budget-hero::after {
-    content: ''; position: absolute;
-    top: -40px; right: -40px; width: 140px; height: 140px;
-    background: radial-gradient(circle, rgba(94,207,170,0.1), transparent 70%);
-  }
-  .budget-month-label {
-    font-size: 11px; color: var(--muted2); text-transform: uppercase;
-    letter-spacing: 1px; font-weight: 700; margin-bottom: 6px;
-  }
-  .budget-ring-wrap {
-    display: flex; align-items: center; gap: 20px; margin-bottom: 16px;
-  }
-  .budget-ring-info { flex: 1; }
-  .bri-remaining { font-size: 30px; font-weight: 900; color: var(--accent); letter-spacing: -1px; }
-  .bri-label { font-size: 11px; color: var(--muted2); margin-bottom: 12px; }
-  .bri-pills { display: flex; gap: 8px; flex-wrap: wrap; }
-  .bri-pill {
-    padding: 5px 12px; border-radius: 20px;
-    font-size: 11px; font-weight: 800;
-    background: var(--surface2); color: var(--muted2);
-  }
-  .bri-pill.income-pill { color: var(--accent); }
-  .bri-pill.spent-pill  { color: var(--accent4); }
 
-  /* Ring SVG */
-  .budget-ring { flex-shrink: 0; position: relative; }
-  .ring-center-text {
-    position: absolute; inset: 0;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    text-align: center; pointer-events: none;
-  }
-  .ring-pct { font-size: 18px; font-weight: 900; }
-  .ring-sub { font-size: 9px; color: var(--muted); font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.5px; }
-
-  /* Income vs Expenses mini bar */
-  .budget-cashflow {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-  }
-  .bcf-item {
-    background: var(--surface2); border-radius: 14px; padding: 10px 12px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .bcf-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .bcf-info { flex: 1; }
-  .bcf-val { font-size: 14px; font-weight: 900; }
-  .bcf-label { font-size: 9px; color: var(--muted); text-transform: uppercase;
-    letter-spacing: 0.5px; font-weight: 700; }
-
-  /* Budget category rows */
-  .bcat-row {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 18px; padding: 14px 16px;
-    margin-bottom: 8px; cursor: pointer; transition: all 0.2s;
-  }
-  .bcat-row:active { transform: scale(0.98); }
-  .bcat-row-top {
-    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
-  }
-  .bcat-icon {
-    width: 38px; height: 38px; border-radius: 13px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; flex-shrink: 0;
-  }
-  .bcat-name { font-size: 14px; font-weight: 800; flex: 1; }
-  .bcat-pct-badge {
-    padding: 3px 10px; border-radius: 20px;
-    font-size: 11px; font-weight: 900;
-  }
-  .bpct-ok       { background: rgba(94,207,170,0.15); color: var(--accent); }
-  .bpct-warn     { background: rgba(232,184,109,0.2); color: var(--accent3); }
-  .bpct-danger   { background: rgba(224,123,138,0.2); color: var(--accent4); }
-  .bpct-over     { background: rgba(224,123,138,0.3); color: var(--accent4); }
-
-  .bcat-bar-track {
-    height: 7px; background: var(--surface2); border-radius: 6px; overflow: hidden;
-    margin-bottom: 6px;
-  }
-  .bcat-bar-fill { height: 100%; border-radius: 6px; transition: width 0.9s cubic-bezier(0.34,1.2,0.64,1); }
-  .bcat-row-bottom {
-    display: flex; justify-content: space-between;
-    font-size: 11px; color: var(--muted2);
-  }
-  .bcat-spent { font-weight: 800; }
-
-  /* Savings goals */
-  .savings-goal {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 18px; padding: 14px 16px; margin-bottom: 8px;
-  }
-  .sg-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .sg-icon { font-size: 22px; }
-  .sg-info { flex: 1; }
-  .sg-name { font-size: 14px; font-weight: 800; margin-bottom: 2px; }
-  .sg-deadline { font-size: 11px; color: var(--muted2); }
-  .sg-pct { font-size: 16px; font-weight: 900; color: var(--accent); }
-  .sg-bar-track { height: 8px; background: var(--surface2); border-radius: 6px; overflow: hidden; margin-bottom: 6px; }
-  .sg-bar-fill { height: 100%; border-radius: 6px;
-    background: linear-gradient(90deg, var(--accent2), var(--accent)); transition: width 1s ease; }
-  .sg-bottom { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted2); }
-  .sg-add-btn {
-    padding: 5px 12px; border-radius: 10px;
+  /* ══ SYNC & SHARED FEATURES ══ */
+  .sync-bar {
+    position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 420px;
     background: var(--accent); color: #0e1420;
-    font-size: 11px; font-weight: 900; border: none;
-    cursor: pointer; font-family: 'Nunito', sans-serif;
-    transition: all 0.2s;
-  }
-  .sg-add-btn:active { transform: scale(0.92); }
-
-  /* Add income modal tab */
-  .income-type-toggle {
-    display: grid; grid-template-columns: 1fr 1fr 1fr;
-    gap: 6px; margin-bottom: 14px;
-  }
-  .itt-opt {
-    padding: 10px 6px; border-radius: 14px;
-    background: var(--surface2); border: 2px solid transparent;
-    text-align: center; cursor: pointer; transition: all 0.2s; font-size: 11px; font-weight: 800;
-  }
-  .itt-opt.selected { border-color: var(--accent); background: rgba(94,207,170,0.1); color: var(--accent); }
-  .itt-opt:active { transform: scale(0.93); }
-
-
-  /* ── PWA Install Banner ── */
-  .pwa-banner {
-    position: fixed;
-    bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 32px);
-    max-width: 388px;
-    background: var(--surface);
-    border: 1px solid var(--accent);
-    border-radius: 20px;
-    padding: 14px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    z-index: 500;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    animation: slideUp 0.4s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  .pwa-banner.hidden { display: none; }
-  .pwa-banner-icon {
-    width: 44px; height: 44px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px; flex-shrink: 0; color: #0e1420; font-weight: 900;
-  }
-  .pwa-banner-text { flex: 1; }
-  .pwa-banner-title { font-size: 13px; font-weight: 900; color: var(--text); margin-bottom: 2px; }
-  .pwa-banner-sub { font-size: 11px; color: var(--muted2); }
-  .pwa-install-btn {
-    padding: 8px 14px;
-    background: var(--accent);
-    border: none; border-radius: 12px;
-    font-size: 12px; font-weight: 900;
-    color: #0e1420; cursor: pointer;
+    padding: 8px 16px; z-index: 999;
+    display: none; align-items: center; justify-content: center;
+    gap: 8px; font-size: 12px; font-weight: 900;
     font-family: 'Nunito', sans-serif;
-    flex-shrink: 0;
-    transition: all 0.2s;
   }
-  .pwa-install-btn:active { transform: scale(0.93); }
-  .pwa-close-btn {
-    width: 24px; height: 24px;
-    background: var(--surface2);
-    border: none; border-radius: 8px;
-    color: var(--muted); cursor: pointer;
-    font-size: 14px; display: flex;
-    align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
+  .sync-bar.show { display: flex; }
+  .sync-bar.error { background: var(--accent4); color: #fff; }
+  .sync-bar.syncing { background: var(--accent3); }
 
-  /* iOS install tip */
-  .ios-tip {
-    position: fixed;
-    bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 32px);
-    max-width: 388px;
-    background: var(--surface);
+  .user-toggle {
+    display: flex; gap: 6px; margin-bottom: 14px;
+  }
+  .user-btn {
+    flex: 1; padding: 9px; border-radius: 14px;
+    background: var(--surface2); border: 2px solid transparent;
+    font-size: 12px; font-weight: 900; color: var(--muted2);
+    cursor: pointer; text-align: center; transition: all 0.2s;
+    font-family: 'Nunito', sans-serif;
+  }
+  .user-btn.active-cha     { border-color: var(--accent);  background: rgba(94,207,170,0.12); color: var(--accent); }
+  .user-btn.active-chad { border-color: var(--accent2); background: rgba(107,163,214,0.12); color: var(--accent2); }
+
+  .setup-modal {
+    position: fixed; inset: 0; z-index: 600;
+    background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+    display: none; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .setup-modal.show { display: flex; }
+  .setup-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 28px; padding: 28px 24px; width: 100%; max-width: 380px;
+  }
+  .setup-box h2 { font-size: 20px; font-weight: 900; margin-bottom: 6px; color: var(--text); }
+  .setup-box p  { font-size: 13px; color: var(--muted2); margin-bottom: 20px; line-height: 1.5; }
+
+  /* Combined summary card */
+  .combined-card {
+    background: linear-gradient(135deg, var(--surface), var(--surface2));
     border: 1px solid var(--accent2);
-    border-radius: 20px;
-    padding: 16px;
-    z-index: 500;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    animation: slideUp 0.4s cubic-bezier(0.34,1.56,0.64,1);
-    display: none;
+    border-radius: 24px; padding: 18px;
+    margin-bottom: 16px;
   }
-  .ios-tip.show { display: block; }
-  .ios-tip-title { font-size: 14px; font-weight: 900; color: var(--text); margin-bottom: 8px; }
-  .ios-tip-steps { font-size: 12px; color: var(--muted2); line-height: 1.9; }
-  .ios-tip-steps span { color: var(--text); font-weight: 700; }
-  .ios-tip-close {
-    margin-top: 12px; width: 100%;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 12px; padding: 8px;
-    font-size: 12px; font-weight: 700; color: var(--muted2);
-    cursor: pointer; font-family: 'Nunito', sans-serif;
+  .combined-title { font-size: 11px; font-weight: 900; color: var(--muted2);
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
+  .combined-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .combined-person {
+    flex: 1; background: var(--surface2); border-radius: 16px; padding: 12px;
+    text-align: center;
   }
+  .cp-name { font-size: 10px; font-weight: 900; text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 6px; }
+  .cp-amount { font-size: 18px; font-weight: 900; }
+  .combined-total {
+    background: var(--surface2); border-radius: 16px; padding: 12px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .ct-label { font-size: 12px; font-weight: 700; color: var(--muted2); }
+  .ct-val { font-size: 16px; font-weight: 900; }
 
 </style>
 </head>
@@ -2183,6 +2177,14 @@
         <input class="field-input" id="exp-date" type="date">
       </div>
 
+      
+      <div class="field-group">
+        <div class="field-label" style="font-size:11px;font-weight:900;color:var(--muted2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px">Added By</div>
+        <div class="user-toggle">
+          <div class="user-btn" id="exp-user-cha" onclick="selectExpUser('Cha')">👩 Cha</div>
+          <div class="user-btn" id="exp-user-chad" onclick="selectExpUser('Chad')">👨 Chad</div>
+        </div>
+      </div>
       <button class="submit-btn" onclick="saveExpense()">💾 Save Expense</button>
     </div>
   </div>
@@ -2306,123 +2308,7 @@
 
 
   <!-- ══ HULOG / INSTALLMENTS SCREEN ══ -->
-  <div class="screen" id="screen-hulog">
-    <div class="screen-header">
-      <div class="back-btn" onclick="closeScreen('hulog')">←</div>
-      <div class="screen-title">📦 Installments</div>
-      <div class="screen-action" onclick="openAddHulog()">+</div>
-    </div>
-    <div class="screen-content">
-
-      <!-- Summary -->
-      <div class="hulog-summary">
-        <div class="hs-card">
-          <div class="hs-icon">📦</div>
-          <div class="hs-val warning" id="hs-active">0</div>
-          <div class="hs-label">Active Plans</div>
-        </div>
-        <div class="hs-card">
-          <div class="hs-icon">💸</div>
-          <div class="hs-val negative" id="hs-monthly">₱0</div>
-          <div class="hs-label">Monthly Total</div>
-        </div>
-        <div class="hs-card">
-          <div class="hs-icon">⚠️</div>
-          <div class="hs-val" id="hs-due" style="color:var(--accent3)">₱0</div>
-          <div class="hs-label">Due This Month</div>
-        </div>
-        <div class="hs-card">
-          <div class="hs-icon">✅</div>
-          <div class="hs-val positive" id="hs-done">0</div>
-          <div class="hs-label">Completed</div>
-        </div>
-      </div>
-
-      <!-- Filter tabs -->
-      <div class="filter-tabs" id="hulog-filter-tabs">
-        <div class="ftab active" onclick="filterHulog('all',this)">All</div>
-        <div class="ftab" onclick="filterHulog('active',this)">Active</div>
-        <div class="ftab" onclick="filterHulog('due',this)">Due Soon ⚠️</div>
-        <div class="ftab" onclick="filterHulog('done',this)">Completed ✅</div>
-      </div>
-
-      <!-- Hulog list -->
-      <div id="hulog-list"></div>
-      <div class="empty-state" id="hulog-empty">
-        <div class="empty-icon">🎉</div>
-        <div class="empty-title">No installments!</div>
-        <div class="empty-sub">Add a hulog item to start tracking<br>your payment progress.</div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Add Hulog Modal -->
-  <div class="add-debt-modal" id="addHulogModal">
-    <div class="adm-backdrop" onclick="closeAddHulog()"></div>
-    <div class="adm-sheet">
-      <div class="adm-handle"></div>
-      <div class="adm-title">📦 Add Installment Plan</div>
-
-      <div class="field-label" style="margin-bottom:8px">Item Type</div>
-      <div class="add-cat-grid" style="margin-bottom:14px" id="hulog-type-grid">
-        <div class="add-cat-opt selected" data-htype="appliance" onclick="selectHulogType('appliance',this)">
-          <div class="add-cat-opt-icon">🏠</div><div class="add-cat-opt-name">Appliance</div>
-        </div>
-        <div class="add-cat-opt" data-htype="gadget" onclick="selectHulogType('gadget',this)">
-          <div class="add-cat-opt-icon">📱</div><div class="add-cat-opt-name">Gadget</div>
-        </div>
-        <div class="add-cat-opt" data-htype="vehicle" onclick="selectHulogType('vehicle',this)">
-          <div class="add-cat-opt-icon">🏍️</div><div class="add-cat-opt-name">Vehicle</div>
-        </div>
-        <div class="add-cat-opt" data-htype="loan" onclick="selectHulogType('loan',this)">
-          <div class="add-cat-opt-icon">🏦</div><div class="add-cat-opt-name">Loan</div>
-        </div>
-        <div class="add-cat-opt" data-htype="school" onclick="selectHulogType('school',this)">
-          <div class="add-cat-opt-icon">🎓</div><div class="add-cat-opt-name">School</div>
-        </div>
-        <div class="add-cat-opt" data-htype="medical" onclick="selectHulogType('medical',this)">
-          <div class="add-cat-opt-icon">🏥</div><div class="add-cat-opt-name">Medical</div>
-        </div>
-        <div class="add-cat-opt" data-htype="rent" onclick="selectHulogType('rent',this)">
-          <div class="add-cat-opt-icon">🏡</div><div class="add-cat-opt-name">Rent</div>
-        </div>
-        <div class="add-cat-opt" data-htype="others" onclick="selectHulogType('others',this)">
-          <div class="add-cat-opt-icon">📦</div><div class="add-cat-opt-name">Others</div>
-        </div>
-      </div>
-
-      <div class="field-group">
-        <div class="field-label">Item Name</div>
-        <input class="field-input" id="hulog-name" type="text" placeholder="e.g. Samsung Ref, Motor Loan">
-      </div>
-      <div class="field-group">
-        <div class="field-label">Store / Source</div>
-        <input class="field-input" id="hulog-store" type="text" placeholder="e.g. SM Appliance, BDO">
-      </div>
-      <div class="field-group">
-        <div class="field-label">Total Amount (₱)</div>
-        <input class="field-input" id="hulog-total" type="number" placeholder="0.00">
-      </div>
-      <div class="field-group">
-        <div class="field-label">Monthly Payment (₱)</div>
-        <input class="field-input" id="hulog-monthly" type="number" placeholder="0.00">
-      </div>
-      <div class="field-group">
-        <div class="field-label">Months Already Paid</div>
-        <input class="field-input" id="hulog-paid-months" type="number" placeholder="0" value="0">
-      </div>
-      <div class="field-group">
-        <div class="field-label">Next Due Date</div>
-        <input class="field-input" id="hulog-due" type="date">
-      </div>
-
-      <button class="submit-btn" onclick="saveHulog()">💾 Save Installment Plan</button>
-    </div>
-  </div>
-
-
-  <!-- ══ FAMILY BUDGET SCREEN ══ -->
+    <!-- ══ FAMILY BUDGET SCREEN ══ -->
   <div class="screen" id="screen-pamilya">
     <div class="screen-header">
       <div class="back-btn" onclick="closeScreen('pamilya')">←</div>
@@ -2520,102 +2406,7 @@
 
 
   <!-- ══ FAMILY BUDGET SCREEN ══ -->
-  <div class="screen" id="screen-pamilya">
-    <div class="screen-header">
-      <div class="back-btn" onclick="closeScreen('pamilya')">←</div>
-      <div class="screen-title">🏡 Family Budget</div>
-      <div class="screen-action" onclick="openAddIncome()">+</div>
-    </div>
-    <div class="screen-content">
-
-      <!-- Budget Ring Hero -->
-      <div class="budget-hero">
-        <div class="budget-month-label">March 2026 — Budget Overview</div>
-        <div class="budget-ring-wrap">
-          <div class="budget-ring" style="width:110px;height:110px;position:relative">
-            <svg width="110" height="110" viewBox="0 0 110 110" id="budget-ring-svg">
-              <circle cx="55" cy="55" r="44" fill="none" stroke="var(--surface2)" stroke-width="14"/>
-            </svg>
-            <div class="ring-center-text">
-              <div class="ring-pct" id="ring-pct">0%</div>
-              <div class="ring-sub">Used</div>
-            </div>
-          </div>
-          <div class="budget-ring-info">
-            <div class="bri-remaining" id="bri-remaining">₱0</div>
-            <div class="bri-label">remaining this month</div>
-            <div class="bri-pills">
-              <div class="bri-pill income-pill" id="bri-income">↑ ₱0 in</div>
-              <div class="bri-pill spent-pill"  id="bri-spent">↓ ₱0 out</div>
-            </div>
-          </div>
-        </div>
-        <div class="budget-cashflow">
-          <div class="bcf-item">
-            <div class="bcf-dot" style="background:var(--accent)"></div>
-            <div class="bcf-info">
-              <div class="bcf-val positive" id="bcf-salary">₱0</div>
-              <div class="bcf-label">Salary</div>
-            </div>
-          </div>
-          <div class="bcf-item">
-            <div class="bcf-dot" style="background:var(--accent2)"></div>
-            <div class="bcf-info">
-              <div class="bcf-val" style="color:var(--accent2)" id="bcf-other">₱0</div>
-              <div class="bcf-label">Other Income</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Budget Categories -->
-      <div class="section-title">Budget Categories</div>
-      <div id="budget-cat-list"></div>
-
-      <!-- Savings Goals -->
-      <div class="section-title" style="margin-top:8px">🐷 Savings Goals</div>
-      <div id="savings-list"></div>
-
-    </div>
-  </div>
-
-  <!-- Add Income/Budget Modal -->
-  <div class="add-debt-modal" id="addIncomeModal">
-    <div class="adm-backdrop" onclick="closeAddIncome()"></div>
-    <div class="adm-sheet">
-      <div class="adm-handle"></div>
-      <div class="adm-title" id="income-modal-title">Add Income</div>
-      <div class="income-type-toggle">
-        <div class="itt-opt selected" id="itt-salary" onclick="selectIncomeType('salary',this)">💼 Salary</div>
-        <div class="itt-opt" id="itt-other" onclick="selectIncomeType('other',this)">🤑 Other</div>
-        <div class="itt-opt" id="itt-budget" onclick="selectIncomeType('budget',this)">📋 Budget</div>
-      </div>
-      <div class="field-group">
-        <div class="field-label" id="income-field-label">Source / Description</div>
-        <input class="field-input" id="income-desc" type="text" placeholder="e.g. Monthly salary">
-      </div>
-      <div class="field-group">
-        <div class="field-label">Amount (₱)</div>
-        <input class="field-input" id="income-amount" type="number" placeholder="0.00">
-      </div>
-      <div class="field-group" id="budget-cat-field" style="display:none">
-        <div class="field-label">Category</div>
-        <select class="field-input" id="income-budget-cat">
-          <option value="food">🍚 Food & Groceries</option>
-          <option value="bills">⚡ Bills & Utilities</option>
-          <option value="transpo">🚌 Transportation</option>
-          <option value="health">💊 Health & Medical</option>
-          <option value="school">🎓 Education</option>
-          <option value="leisure">🎮 Leisure & Fun</option>
-          <option value="savings">🐷 Savings</option>
-          <option value="others">📦 Others</option>
-        </select>
-      </div>
-      <button class="submit-btn" onclick="saveIncome()">💾 Save</button>
-    </div>
-  </div>
-
-  <!-- Theme Panel -->
+    <!-- Theme Panel -->
   <div class="theme-panel" id="themePanel">
     <div class="theme-backdrop" onclick="closeTheme()"></div>
     <div class="theme-sheet">
@@ -2680,6 +2471,41 @@
         </div>
 
       </div>
+    </div>
+  </div>
+
+
+  <!-- Sync Status Bar -->
+  <div class="sync-bar" id="syncBar">
+    <span id="syncMsg">⟳ Syncing...</span>
+  </div>
+
+  <!-- Setup Modal -->
+  <div class="setup-modal" id="setupModal">
+    <div class="setup-box">
+      <h2>👋 Welcome to BudgetBuddy!</h2>
+      <p>First, who are you? This helps track who added each expense.</p>
+
+      <div class="user-toggle" style="margin-bottom:20px">
+        <div class="user-btn" id="setup-cha" onclick="selectUser('Cha')">👩 Cha</div>
+        <div class="user-btn" id="setup-chad" onclick="selectUser('Chad')">👨 Chad</div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label" style="font-size:11px;font-weight:900;color:var(--muted2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px">
+          Google Apps Script URL <span style="color:var(--muted)">(optional — for sync)</span>
+        </div>
+        <input class="field-input" id="setup-url" type="url"
+          placeholder="https://script.google.com/macros/s/..."
+          style="font-size:12px">
+        <div style="font-size:10px;color:var(--muted);margin-top:6px">
+          Leave blank to use offline only. Add later via ⚙️ settings.
+        </div>
+      </div>
+
+      <button class="submit-btn" onclick="finishSetup()" style="margin-top:8px">
+        Let's go! 🚀
+      </button>
     </div>
   </div>
 
@@ -2757,6 +2583,9 @@
     }
     // Init debt tracker
     renderDebts();
+    try { renderExpenses(); } catch(e) {}
+    try { renderHulogs(); } catch(e) {}
+    try { renderBudget(); } catch(e) {}
   });
 
   // ══ SCREEN NAVIGATION ══
@@ -2966,7 +2795,7 @@
       position:fixed; top:80px; left:50%; transform:translateX(-50%);
       background:rgba(26,34,54,0.95); border:1px solid rgba(255,255,255,0.1);
       color:#f1f5f9; padding:10px 18px; border-radius:20px; font-size:13px;
-      font-family:'Nunito',sans-serif; z-index:999; white-space:nowrap;
+      font-family:var(--font); z-index:999; white-space:nowrap;
       box-shadow:0 4px 20px rgba(0,0,0,0.3); backdrop-filter:blur(10px);
       animation: fadeUp 0.3s ease;
     `;
@@ -3611,6 +3440,176 @@
     if (isIOS && !isStandalone && !localStorage.getItem('bb-ios-tip-seen')) {
       setTimeout(showIosTip, 3000);
     }
+  });
+
+
+  // ══ SHARED / SYNC SYSTEM ══
+  let currentUser = localStorage.getItem('bb-user') || '';
+  let scriptUrl   = localStorage.getItem('bb-script-url') || '';
+  let expUser     = currentUser || 'Cha';
+  let isSyncing   = false;
+
+  // Show setup modal on first visit
+  window.addEventListener('DOMContentLoaded', () => {
+    if (!currentUser) {
+      setTimeout(() => document.getElementById('setupModal').classList.add('show'), 800);
+    }
+    // Add combined summary to dashboard
+    renderCombinedSummary();
+  });
+
+  function selectUser(user) {
+    expUser = user;
+    document.getElementById('setup-cha').className     = 'user-btn' + (user==='Cha'     ? ' active-cha'     : '');
+    document.getElementById('setup-chad').className = 'user-btn' + (user==='Chad' ? ' active-chad'  : '');
+  }
+
+  function selectExpUser(user) {
+    expUser = user;
+    document.getElementById('exp-user-cha').className     = 'user-btn' + (user==='Cha'     ? ' active-cha'     : '');
+    document.getElementById('exp-user-chad').className = 'user-btn' + (user==='Chad' ? ' active-chad'  : '');
+  }
+
+  function finishSetup() {
+    const user = expUser || 'Cha';
+    const url  = document.getElementById('setup-url').value.trim();
+    currentUser = user;
+    if (url) scriptUrl = url;
+    localStorage.setItem('bb-user', currentUser);
+    if (scriptUrl) localStorage.setItem('bb-script-url', scriptUrl);
+    document.getElementById('setupModal').classList.remove('show');
+    showToast('👋 Welcome, ' + currentUser + '!');
+    if (scriptUrl) syncFromCloud();
+  }
+
+  // ── Sync Bar ──────────────────────────────────────────
+  function showSyncBar(msg, type = '') {
+    const bar = document.getElementById('syncBar');
+    const msgEl = document.getElementById('syncMsg');
+    bar.className = 'sync-bar show' + (type ? ' ' + type : '');
+    msgEl.textContent = msg;
+    if (type !== 'syncing') setTimeout(() => bar.classList.remove('show'), 3000);
+  }
+
+  // ── Push to Google Sheets ─────────────────────────────
+  async function pushToCloud(action, data) {
+    if (!scriptUrl) return;
+    try {
+      const payload = { action, data: { ...data, addedby: currentUser } };
+      const res = await fetch(scriptUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        mode: 'no-cors'
+      });
+      showSyncBar('✅ Saved to cloud!');
+    } catch (e) {
+      showSyncBar('⚠️ Offline — saved locally', 'error');
+    }
+  }
+
+  // ── Pull from Google Sheets ───────────────────────────
+  async function syncFromCloud() {
+    if (!scriptUrl || isSyncing) return;
+    isSyncing = true;
+    showSyncBar('⟳ Syncing...', 'syncing');
+    try {
+      const res  = await fetch(scriptUrl + '?action=getAll');
+      const json = await res.json();
+      if (json.success && json.data) {
+        const d = json.data;
+        if (d.expenses && d.expenses.length) {
+          expenses = d.expenses.map(e => ({
+            id: e.id, cat: e.category, desc: e.description,
+            amount: parseFloat(e.amount)||0, date: e.date,
+            addedBy: e.addedby || ''
+          }));
+        }
+        if (d.income && d.income.length) {
+          // merge into budgetData
+        }
+        renderExpenses();
+        renderCombinedSummary();
+        showSyncBar('✅ Synced with ' + (currentUser === 'Cha' ? 'Chad' : 'Cha') + ''s data!');
+      }
+    } catch (e) {
+      showSyncBar('⚠️ Could not sync — check connection', 'error');
+    }
+    isSyncing = false;
+  }
+
+  // ── Combined Summary Card ─────────────────────────────
+  function renderCombinedSummary() {
+    const currentMonth = new Date().toISOString().slice(0, 7);
+    const chaExp = expenses
+      .filter(e => e.date && e.date.startsWith(currentMonth) && e.addedBy === 'Cha')
+      .reduce((s,e) => s + e.amount, 0);
+    const hubExp = expenses
+      .filter(e => e.date && e.date.startsWith(currentMonth) && e.addedBy === 'Chad')
+      .reduce((s,e) => s + e.amount, 0);
+    const total = chaExp + hubExp;
+
+    // Inject combined card into dashboard if not exists
+    let card = document.getElementById('combined-card');
+    if (!card) {
+      card = document.createElement('div');
+      card.id = 'combined-card';
+      card.className = 'combined-card';
+      // Insert after net-card
+      const netCard = document.querySelector('.net-card');
+      if (netCard) netCard.insertAdjacentElement('afterend', card);
+    }
+
+    card.innerHTML =
+      '<div class="combined-title">👫 Combined Expenses This Month</div>' +
+      '<div class="combined-row">' +
+        '<div class="combined-person">' +
+          '<div class="cp-name" style="color:var(--accent)">👩 Cha</div>' +
+          '<div class="cp-amount" style="color:var(--accent4)">₱' + chaExp.toLocaleString() + '</div>' +
+        '</div>' +
+        '<div class="combined-person">' +
+          '<div class="cp-name" style="color:var(--accent2)">👨 Chad</div>' +
+          '<div class="cp-amount" style="color:var(--accent4)">₱' + hubExp.toLocaleString() + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="combined-total">' +
+        '<span class="ct-label">Total Combined</span>' +
+        '<span class="ct-val" style="color:var(--accent4)">₱' + total.toLocaleString() + '</span>' +
+      '</div>';
+  }
+
+  // Override saveExpense to push to cloud + tag user
+  const _origSaveExpense = saveExpense;
+  function saveExpense() {
+    _origSaveExpense();
+    // Tag last expense with current user
+    if (expenses.length > 0) {
+      expenses[0].addedBy = expUser;
+      // Push to cloud
+      pushToCloud('addExpense', {
+        id: expenses[0].id,
+        date: expenses[0].date,
+        category: expenses[0].cat,
+        description: expenses[0].desc,
+        amount: expenses[0].amount,
+        addedby: expUser,
+      });
+    }
+    renderCombinedSummary();
+  }
+
+  // Add sync button to header
+  document.addEventListener('DOMContentLoaded', () => {
+    const headerActions = document.querySelector('.header-actions');
+    if (headerActions && scriptUrl) {
+      const syncBtn = document.createElement('div');
+      syncBtn.className = 'icon-btn';
+      syncBtn.innerHTML = '🔄';
+      syncBtn.onclick = syncFromCloud;
+      headerActions.insertBefore(syncBtn, headerActions.firstChild);
+    }
+    // Set exp user default
+    selectExpUser(currentUser || 'Cha');
   });
 
 </script>
