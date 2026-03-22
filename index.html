@@ -135,9 +135,9 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
 .fab:active{transform:scale(.9)}
 
 /* ── SCREENS ────────────────────────────── */
-.screen{display:none;flex-direction:column;position:fixed;inset:0;max-width:420px;left:50%;transform:translateX(-50%);background:var(--bg);z-index:200;overflow:hidden}
+.screen{display:none;flex-direction:column;position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;background:var(--bg);z-index:200;overflow:hidden}
 .screen.open{display:flex;animation:slideIn .25s ease}
-@keyframes slideIn{from{transform:translateX(calc(-50% + 40px));opacity:0}to{transform:translateX(-50%);opacity:1}}
+@keyframes slideIn{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}
 .screen-hdr{padding:14px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bdr);background:var(--bg);flex-shrink:0}
 .back-btn{width:36px;height:36px;border-radius:12px;background:var(--surf2);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0}
 .back-btn:active{transform:scale(.9)}
@@ -249,7 +249,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-h
 .goal-add-btn:active{transform:scale(.92)}
 
 /* ── MODALS ─────────────────────────────── */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);z-index:300;display:none;align-items:flex-end;justify-content:center}
+.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);z-index:300;display:none;align-items:flex-end;justify-content:center}
 .overlay.open{display:flex}
 .sheet{width:100%;max-width:420px;background:var(--surf);border-radius:28px 28px 0 0;border-top:1px solid var(--bdr);padding:20px 20px 44px;max-height:90vh;overflow-y:auto;animation:sheetUp .3s cubic-bezier(.34,1.2,.64,1)}
 @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
@@ -363,7 +363,7 @@ select.field-in{appearance:none}
     </div>
     <div class="hdr-acts">
       <div class="icon-btn" id="pdf-btn" title="Export PDF" onclick="exportPDF()">📄</div>
-      <div class="icon-btn" id="sync-btn" onclick="syncFromCloud(false)" title="Sync">🔄</div>
+      <div class="icon-btn" id="sync-btn" onclick="syncFromCloud(false)" title="Sync" style="display:none">🔄</div>
       <div class="icon-btn" id="bell-btn" onclick="openDues()">🔔<div class="notif-dot" id="notif-dot"></div></div>
       <div class="icon-btn" onclick="openTheme()">⚙️</div>
     </div>
@@ -592,7 +592,10 @@ select.field-in{appearance:none}
       </div>
       <div class="sec-title">Budget Categories</div>
       <div id="budget-cat-list"></div>
-      <div class="sec-title" style="margin-top:8px">🐷 Savings Goals</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+      <div class="sec-title" style="margin:0">🐷 Savings Goals</div>
+      <button onclick="openModal('add-goal')" style="padding:6px 14px;background:var(--acc);color:var(--bg);border:none;border-radius:12px;font-size:12px;font-weight:900;cursor:pointer;font-family:inherit">+ Add Goal</button>
+    </div>
       <div id="savings-list"></div>
     </div>
   </div>
@@ -601,7 +604,7 @@ select.field-in{appearance:none}
 
   <!-- Quick Add -->
   <div class="overlay" id="modal-quick">
-    <div class="sheet">
+    <div class="sheet" onclick="event.stopPropagation()">
       <div class="sheet-handle"></div>
       <div class="sheet-title">What do you want to add?</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
@@ -615,7 +618,7 @@ select.field-in{appearance:none}
 
   <!-- Add Debt -->
   <div class="overlay" id="modal-add-debt">
-    <div class="sheet">
+    <div class="sheet" onclick="event.stopPropagation()">
       <div class="sheet-handle"></div>
       <div class="sheet-title">Add Debt Record</div>
       <div class="type-toggle">
@@ -632,7 +635,7 @@ select.field-in{appearance:none}
 
   <!-- Add Expense -->
   <div class="overlay" id="modal-add-expense">
-    <div class="sheet">
+    <div class="sheet" onclick="event.stopPropagation()">
       <div class="sheet-handle"></div>
       <div class="sheet-title">Log an Expense</div>
       <div class="field-lbl" style="margin-bottom:8px">Category</div>
@@ -651,7 +654,7 @@ select.field-in{appearance:none}
 
   <!-- Add Hulog -->
   <div class="overlay" id="modal-add-hulog">
-    <div class="sheet">
+    <div class="sheet" onclick="event.stopPropagation()">
       <div class="sheet-handle"></div>
       <div class="sheet-title">📦 Add Installment Plan</div>
       <div class="field-lbl" style="margin-bottom:8px">Item Type</div>
@@ -668,7 +671,7 @@ select.field-in{appearance:none}
 
   <!-- Add Income / Budget Spending -->
   <div class="overlay" id="modal-add-income">
-    <div class="sheet">
+    <div class="sheet" onclick="event.stopPropagation()">
       <div class="sheet-handle"></div>
       <div class="sheet-title" id="income-modal-title">Add Income</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:16px">
@@ -697,7 +700,7 @@ select.field-in{appearance:none}
 
   <!-- Theme Picker -->
   <div class="overlay" id="modal-theme">
-    <div class="sheet">
+    <div class="sheet" onclick="event.stopPropagation()">
       <div class="sheet-handle"></div>
       <div class="sheet-title">🎨 Choose Your Theme</div>
       <div style="font-size:12px;color:var(--mut2);margin-bottom:18px">Pick a look that feels right for you</div>
@@ -707,11 +710,26 @@ select.field-in{appearance:none}
 
   <!-- Due Dates Sheet -->
   <div class="overlay" id="modal-dues">
-    <div class="sheet">
+    <div class="sheet" onclick="event.stopPropagation()">
       <div class="sheet-handle"></div>
       <div class="sheet-title">🔔 Upcoming Due Dates</div>
       <div style="font-size:12px;color:var(--mut2);margin-bottom:16px" id="dues-sub">Checking schedule...</div>
       <div id="dues-list"></div>
+    </div>
+  </div>
+
+
+  <!-- Add Savings Goal -->
+  <div class="overlay" id="modal-add-goal">
+    <div class="sheet" onclick="event.stopPropagation()">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">🐷 Add Savings Goal</div>
+      <div class="field-grp"><div class="field-lbl">Icon (emoji)</div><input class="field-in" id="g-icon" type="text" placeholder="🏖️" maxlength="2" value="🎯"></div>
+      <div class="field-grp"><div class="field-lbl">Goal Name</div><input class="field-in" id="g-name" type="text" placeholder="e.g. Boracay Vacation"></div>
+      <div class="field-grp"><div class="field-lbl">Target Amount (₱)</div><input class="field-in" id="g-target" type="number" placeholder="0.00"></div>
+      <div class="field-grp"><div class="field-lbl">Already Saved (₱)</div><input class="field-in" id="g-saved" type="number" placeholder="0" value="0"></div>
+      <div class="field-grp"><div class="field-lbl">Target Date</div><input class="field-in" id="g-deadline" type="text" placeholder="e.g. Dec 2026"></div>
+      <button class="submit-btn" onclick="saveGoal()">💾 Save Goal</button>
     </div>
   </div>
 
@@ -793,49 +811,22 @@ const BCAT = {
   others:  {icon:'📦',label:'Others',           color:'#8898aa'},
 };
 
-let debts = [
-  {id:1,type:'oweme',name:'Juan dela Cruz',amount:5000,paid:1500,due:'2026-03-23',notes:'Pinautang sa birthday',settled:false},
-  {id:2,type:'oweme',name:'Maria Santos',  amount:3000,paid:3000,due:'2026-03-01',notes:'Pamasahe',settled:true},
-  {id:3,type:'oweme',name:'Carlo Reyes',   amount:8500,paid:2000,due:'2026-04-10',notes:'Laptop repair',settled:false},
-  {id:4,type:'iowe', name:'Ate Nena',      amount:2000,paid:0,   due:'2026-03-28',notes:'Panglibre sa grocery',settled:false},
-];
-let expenses = [
-  {id:1,cat:'food',   desc:'Jollibee lunch',      amount:350, date:'2026-03-21',addedBy:'Cha'},
-  {id:2,cat:'bills',  desc:'Meralco payment',     amount:1200,date:'2026-03-20',addedBy:'Chad'},
-  {id:3,cat:'transpo',desc:'Grab to office',      amount:185, date:'2026-03-20',addedBy:'Cha'},
-  {id:4,cat:'food',   desc:'SM grocery',          amount:2400,date:'2026-03-19',addedBy:'Cha'},
-  {id:5,cat:'shopping',desc:'New phone case',     amount:299, date:'2026-03-18',addedBy:'Chad'},
-  {id:6,cat:'health', desc:'Biogesic + vitamins', amount:320, date:'2026-03-17',addedBy:'Cha'},
-  {id:7,cat:'food',   desc:'Mang Inasal dinner',  amount:220, date:'2026-03-17',addedBy:'Chad'},
-  {id:8,cat:'transpo',desc:'MRT card reload',     amount:200, date:'2026-03-16',addedBy:'Cha'},
-  {id:9,cat:'leisure',desc:'Netflix subscription',amount:459, date:'2026-03-15',addedBy:'Chad'},
-];
-let hulogs = [
-  {id:1,type:'appliance',name:'LG Inverter Ref',    store:'SM Appliance', total:32000,monthly:2667,paidMonths:6, totalMonths:12,nextDue:'2026-03-25',done:false},
-  {id:2,type:'gadget',   name:'iPhone 15 Postpaid', store:'Globe Telecom',total:54000,monthly:2250,paidMonths:8, totalMonths:24,nextDue:'2026-03-28',done:false},
-  {id:3,type:'loan',     name:'SSS Salary Loan',    store:'SSS',          total:20000,monthly:1667,paidMonths:2, totalMonths:12,nextDue:'2026-04-05',done:false},
-  {id:4,type:'vehicle',  name:'Honda TMX Motor',    store:'Honda Cavite', total:85000,monthly:2361,paidMonths:36,totalMonths:36,nextDue:'2026-02-10',done:true},
-];
+let debts   = [];
+let expenses = [];
+let hulogs   = [];
 let budgetData = {
-  income:[
-    {id:1,type:'salary',desc:'Exelon Salary',amount:38500},
-    {id:2,type:'other', desc:'Freelance work',amount:5000},
-  ],
+  income: [],
   cats:[
-    {cat:'food',   budget:8000,spent:5240},
-    {cat:'bills',  budget:6000,spent:5800},
-    {cat:'transpo',budget:3000,spent:1850},
-    {cat:'health', budget:2000,spent:320},
-    {cat:'school', budget:4000,spent:2000},
-    {cat:'leisure',budget:2500,spent:1850},
-    {cat:'savings',budget:5000,spent:5000},
-    {cat:'others', budget:1500,spent:390},
+    {cat:'food',   budget:5000,spent:0},
+    {cat:'bills',  budget:5000,spent:0},
+    {cat:'transpo',budget:2000,spent:0},
+    {cat:'health', budget:2000,spent:0},
+    {cat:'school', budget:3000,spent:0},
+    {cat:'leisure',budget:2000,spent:0},
+    {cat:'savings',budget:5000,spent:0},
+    {cat:'others', budget:1000,spent:0},
   ],
-  goals:[
-    {id:1,icon:'🏖️',name:'Boracay Vacation',  target:25000, saved:12000,deadline:'Aug 2026'},
-    {id:2,icon:'💻',name:'New Laptop Fund',    target:40000, saved:18500,deadline:'Dec 2026'},
-    {id:3,icon:'🏠',name:'House Down Payment', target:200000,saved:45000,deadline:'Dec 2028'},
-  ],
+  goals:[],
 };
 
 let _debtId=10, _expId=10, _hulogId=10, _incId=10, _goalId=10;
@@ -857,6 +848,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Load saved settings
   currentUser = localStorage.getItem('bb-user') || '';
+  loadLocal(); // restore persisted data
   scriptUrl   = localStorage.getItem('bb-script-url') || '';
 
   // Show setup if first time
@@ -1089,7 +1081,7 @@ function saveDebt() {
   document.getElementById('d-name').value = '';
   document.getElementById('d-amount').value = '';
   document.getElementById('d-notes').value = '';
-  renderDebts(); renderDashboard(); renderDueBanner();
+  renderDebts(); renderDashboard(); renderDueBanner(); saveLocal();
   pushCloud('addDebt',{id:_debtId-1,type:debtType,name,amount:amt,paid:0,duedate:due,notes,settled:false,addedby:currentUser});
   toast('💾 Debt saved!');
 }
@@ -1100,13 +1092,14 @@ function settleDebt(id) {
   d.paid = d.amount; d.settled = true;
   renderDebts(); renderDashboard();
   pushCloud('updateDebt',{...d,duedate:d.due});
+  saveLocal();
   toast('✅ ' + d.name + ' — Settled!');
 }
 
 function deleteDebt(id) {
   if (!confirm('Delete this debt record?')) return;
   debts = debts.filter(x=>x.id!==id);
-  renderDebts(); renderDashboard();
+  renderDebts(); renderDashboard(); saveLocal();
   toast('🗑️ Debt deleted');
 }
 
@@ -1179,7 +1172,7 @@ function renderExpenses() {
           <div class="exp-cat">${c.label}${e.addedBy?' · '+e.addedBy:''}</div>
         </div>
         <div class="exp-amt">${fmt(e.amount)}</div>
-        <button class="del-btn" style="background:var(--acc4)22;color:var(--acc4)" onclick="deleteExpense(${e.id})">✕</button>
+        <button class="del-btn" style="background:var(--acc4)22;color:var(--acc4)" onclick="deleteExpenseById(${e.id})">✕</button>
       </div>`;
     }).join('');
     return `<div class="date-grp-hdr">
@@ -1240,7 +1233,7 @@ function saveExpense() {
   closeModal('add-expense');
   document.getElementById('e-desc').value='';
   document.getElementById('e-amount').value='';
-  renderExpenses(); renderDashboard();
+  renderExpenses(); renderDashboard(); saveLocal();
   pushCloud('addExpense',{id:exp.id,category:expCat,description:desc,amount:amt,date,addedby:expUser});
   toast('💾 Expense saved!');
 }
@@ -1352,7 +1345,7 @@ function payHulog(id) {
   const d=new Date(h.nextDue); d.setMonth(d.getMonth()+1); h.nextDue=d.toISOString().split('T')[0];
   if (h.paidMonths>=h.totalMonths) { h.done=true; toast('🎉 '+h.name+' — Fully Paid!'); }
   else toast('✅ Month '+h.paidMonths+' of '+h.totalMonths+' paid!');
-  renderHulogs(); renderDashboard();
+  renderHulogs(); renderDashboard(); saveLocal();
   pushCloud('updateHulog',{id:h.id,paidmonths:h.paidMonths,nextdue:h.nextDue,done:h.done});
 }
 
@@ -1360,7 +1353,7 @@ function skipHulog(id) {
   const h = hulogs.find(x=>x.id===id);
   if (!h) return;
   const d=new Date(h.nextDue); d.setMonth(d.getMonth()+1); h.nextDue=d.toISOString().split('T')[0];
-  renderHulogs();
+  renderHulogs(); saveLocal();
   toast('⏭️ Skipped — next due moved forward');
 }
 
@@ -1380,7 +1373,7 @@ function saveHulog() {
   closeModal('add-hulog');
   ['h-name','h-store','h-total','h-monthly'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('h-paid').value='0';
-  renderHulogs(); renderDashboard();
+  renderHulogs(); renderDashboard(); saveLocal();
   toast('💾 Installment plan saved!');
 }
 
@@ -1458,7 +1451,7 @@ function addToGoal(id) {
   if (!g) return;
   g.saved = Math.min(g.target, g.saved+500);
   renderBudget();
-  toast('🐷 ₱500 added to ' + g.name + '!');
+  saveLocal(); toast('🐷 ₱500 added to ' + g.name + '!');
 }
 
 function editBudgetCat(cat, current) {
@@ -1499,7 +1492,7 @@ function saveIncome() {
   closeModal('add-income');
   document.getElementById('i-amount').value='';
   document.getElementById('i-desc').value='';
-  renderBudget(); renderDashboard();
+  renderBudget(); renderDashboard(); saveLocal();
   toast(incomeType==='budget'?'💸 Spending logged!':'💰 Income added!');
 }
 
@@ -1637,7 +1630,11 @@ function finishSetup() {
   document.getElementById('setup-modal').classList.remove('open');
   selExpUser(currentUser);
   toast('👋 Welcome, ' + currentUser + '!');
-  if (scriptUrl) { syncFromCloud(false); syncTimer = setInterval(()=>syncFromCloud(true),30000); }
+  if (scriptUrl) {
+    document.getElementById('sync-btn').style.display = 'flex';
+    syncFromCloud(false);
+    syncTimer = setInterval(()=>syncFromCloud(true),30000);
+  }
 }
 
 // ══════════════════════════════════════════════
@@ -1838,6 +1835,61 @@ function dismissIOS()  { document.getElementById('ios-tip').classList.remove('sh
 // ══════════════════════════════════════════════
 //  UTILS
 // ══════════════════════════════════════════════
+
+// ── Save Savings Goal ──────────────────────
+function saveGoal() {
+  const icon     = document.getElementById('g-icon').value.trim() || '🎯';
+  const name     = document.getElementById('g-name').value.trim();
+  const target   = parseFloat(document.getElementById('g-target').value);
+  const saved    = parseFloat(document.getElementById('g-saved').value) || 0;
+  const deadline = document.getElementById('g-deadline').value.trim();
+  if (!name)   return toast('⚠️ Enter a goal name');
+  if (!target) return toast('⚠️ Enter a target amount');
+  budgetData.goals.push({id:_goalId++,icon,name,target,saved,deadline:deadline||'—'});
+  closeModal('add-goal');
+  ['g-name','g-target','g-saved','g-deadline'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('g-icon').value='🎯';
+  renderBudget();
+  saveLocal();
+  toast('💾 Savings goal saved!');
+}
+
+// ── Delete functions ─────────────────────────
+function deleteExpenseById(id) {
+  if (!confirm('Delete this expense?')) return;
+  expenses = expenses.filter(e=>e.id!==id);
+  renderExpenses(); renderDashboard(); saveLocal();
+  toast('🗑️ Expense deleted');
+}
+
+// ── LocalStorage persistence ─────────────────
+function saveLocal() {
+  try {
+    localStorage.setItem('bb-debts',    JSON.stringify(debts));
+    localStorage.setItem('bb-expenses', JSON.stringify(expenses));
+    localStorage.setItem('bb-hulogs',   JSON.stringify(hulogs));
+    localStorage.setItem('bb-budget',   JSON.stringify(budgetData));
+  } catch(e) { console.warn('Save failed:', e); }
+}
+
+function loadLocal() {
+  try {
+    const d = localStorage.getItem('bb-debts');
+    const e = localStorage.getItem('bb-expenses');
+    const h = localStorage.getItem('bb-hulogs');
+    const b = localStorage.getItem('bb-budget');
+    if (d) debts       = JSON.parse(d);
+    if (e) expenses    = JSON.parse(e);
+    if (h) hulogs      = JSON.parse(h);
+    if (b) budgetData  = JSON.parse(b);
+    // Update ID counters
+    if (debts.length)    _debtId  = Math.max(...debts.map(x=>x.id))   + 1;
+    if (expenses.length) _expId   = Math.max(...expenses.map(x=>x.id)) + 1;
+    if (hulogs.length)   _hulogId = Math.max(...hulogs.map(x=>x.id))   + 1;
+    if (budgetData.goals && budgetData.goals.length) _goalId = Math.max(...budgetData.goals.map(x=>x.id)) + 1;
+  } catch(e) { console.warn('Load failed:', e); }
+}
+
 function toast(msg) {
   const existing = document.querySelector('.toast');
   if (existing) existing.remove();
