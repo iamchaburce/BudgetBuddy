@@ -349,6 +349,7 @@ select.field-in{appearance:none}
 .pos{color:var(--acc)} .neg{color:var(--acc4)} .warn{color:var(--acc3)} .info{color:var(--acc2)}
 .hidden{display:none!important}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .fade-in{animation:fadeUp .4s ease both}
 </style>
 </head>
@@ -363,7 +364,7 @@ select.field-in{appearance:none}
     </div>
     <div class="hdr-acts">
       <div class="icon-btn" id="pdf-btn" title="Export PDF" onclick="exportPDF()">📄</div>
-      <div class="icon-btn" id="sync-btn" onclick="syncFromCloud(false)" title="Sync" style="display:none">🔄</div>
+      <div class="icon-btn" id="sync-btn" onclick="manualSync()" title="Sync with Google Sheets">🔄</div>
       <div class="icon-btn" id="bell-btn" onclick="openDues()">🔔<div class="notif-dot" id="notif-dot"></div></div>
       <div class="icon-btn" onclick="openTheme()">⚙️</div>
     </div>
@@ -1795,7 +1796,6 @@ function finishSetup() {
   selExpUser(currentUser);
   toast('👋 Welcome, ' + currentUser + '!');
   if (scriptUrl) {
-    document.getElementById('sync-btn').style.display = 'flex';
     syncFromCloud(false);
     syncTimer = setInterval(()=>syncFromCloud(true),30000);
   }
@@ -1818,6 +1818,20 @@ async function pushCloud(action, data) {
     await fetch(scriptUrl, {method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,data:{...data,addedby:currentUser}})});
     showSyncBar('✅ Saved to Google Sheets!');
   } catch(e) { showSyncBar('⚠️ Offline — saved locally','err'); }
+}
+
+function manualSync() {
+  if (!scriptUrl) {
+    // Open setup to enter URL
+    document.getElementById('setup-modal').classList.add('open');
+    toast('⚙️ Enter your Google Sheets URL first');
+    return;
+  }
+  // Animate sync button
+  const btn = document.getElementById('sync-btn');
+  btn.style.animation = 'spin 1s linear infinite';
+  setTimeout(() => btn.style.animation = '', 2000);
+  syncFromCloud(false);
 }
 
 async function syncFromCloud(silent=false) {
