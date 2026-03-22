@@ -440,6 +440,16 @@ select.field-in{appearance:none}
         <div class="mod-sub" id="mod-budget-sub">₱0 left</div>
         <div class="prog-track"><div class="prog-fill" id="mod-budget-prog" style="background:var(--acc)"></div></div>
       </div>
+      <div class="mod-card" onclick="openScreen('loans')" style="grid-column:span 2">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="mod-icon" style="background:rgba(107,163,214,.15);margin-bottom:0">🏦</div>
+          <div>
+            <div class="mod-name">Loan Calculator</div>
+            <div class="mod-val info">Compute monthly payments</div>
+            <div class="mod-sub">Interest rate · amortization · breakdown</div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Upcoming Dues on Dashboard -->
@@ -608,10 +618,11 @@ select.field-in{appearance:none}
       <div class="sheet-handle"></div>
       <div class="sheet-title">What do you want to add?</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div class="type-opt" onclick="closeModal('modal-quick');openScreen('expenses');setTimeout(()=>openModal('add-expense'),300)"><div class="type-icon">💸</div><div class="type-lbl">Expense</div><div class="type-sub">Log a spending</div></div>
-        <div class="type-opt" onclick="closeModal('modal-quick');openModal('add-income')"><div class="type-icon">💰</div><div class="type-lbl">Income</div><div class="type-sub">Add earnings</div></div>
-        <div class="type-opt" onclick="closeModal('modal-quick');openScreen('debts');setTimeout(()=>openModal('add-debt'),300)"><div class="type-icon">🤝</div><div class="type-lbl">Debt</div><div class="type-sub">Track utang</div></div>
-        <div class="type-opt" onclick="closeModal('modal-quick');openScreen('hulog');setTimeout(()=>openModal('add-hulog'),300)"><div class="type-icon">📦</div><div class="type-lbl">Installment</div><div class="type-sub">Add hulog item</div></div>
+        <div class="type-opt" onclick="quickAdd('expense')"><div class="type-icon">💸</div><div class="type-lbl">Expense</div><div class="type-sub">Log a spending</div></div>
+        <div class="type-opt" onclick="quickAdd('income')"><div class="type-icon">💰</div><div class="type-lbl">Income</div><div class="type-sub">Add earnings</div></div>
+        <div class="type-opt" onclick="quickAdd('debt')"><div class="type-icon">🤝</div><div class="type-lbl">Debt</div><div class="type-sub">Track utang</div></div>
+        <div class="type-opt" onclick="quickAdd('hulog')"><div class="type-icon">📦</div><div class="type-lbl">Installment</div><div class="type-sub">Add hulog item</div></div>
+        <div class="type-opt" onclick="quickAdd('loans')" style="grid-column:span 2"><div class="type-icon">🏦</div><div class="type-lbl">Loan Calculator</div><div class="type-sub">Compute payments & amortization</div></div>
       </div>
     </div>
   </div>
@@ -695,6 +706,159 @@ select.field-in{appearance:none}
       </div>
       <div class="field-grp"><div class="field-lbl">Amount (₱)</div><input class="field-in" id="i-amount" type="number" placeholder="0.00"></div>
       <button class="submit-btn" onclick="saveIncome()">💾 Save</button>
+    </div>
+  </div>
+
+
+  <!-- ══ LOAN CALCULATOR SCREEN ══ -->
+  <div class="screen" id="screen-loans">
+    <div class="screen-hdr">
+      <div class="back-btn" onclick="closeScreen('loans')">←</div>
+      <div class="screen-title">🏦 Loan Calculator</div>
+      <div class="add-btn" onclick="saveLoanResult()" title="Save result">💾</div>
+    </div>
+    <div class="screen-body">
+
+      <!-- Input Card -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="sec-title" style="margin-top:0">Loan Details</div>
+
+        <div class="field-grp">
+          <div class="field-lbl">Loan Type</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap" id="loan-type-btns">
+            <button class="ftab on" onclick="selLoanType('personal',this)">Personal</button>
+            <button class="ftab" onclick="selLoanType('home',this)">Home</button>
+            <button class="ftab" onclick="selLoanType('car',this)">Car</button>
+            <button class="ftab" onclick="selLoanType('salary',this)">Salary</button>
+            <button class="ftab" onclick="selLoanType('business',this)">Business</button>
+          </div>
+        </div>
+
+        <div class="field-grp">
+          <div class="field-lbl">Loan Amount (₱)</div>
+          <input class="field-in" id="loan-amount" type="number" placeholder="e.g. 50000" oninput="computeLoan()">
+        </div>
+
+        <div class="field-grp">
+          <div class="field-lbl">Annual Interest Rate (%)</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input class="field-in" id="loan-rate" type="number" placeholder="e.g. 12" step="0.1" oninput="computeLoan()" style="flex:1">
+            <div id="loan-rate-hint" style="font-size:11px;color:var(--mut2);white-space:nowrap;flex-shrink:0"></div>
+          </div>
+        </div>
+
+        <div class="field-grp">
+          <div class="field-lbl">Loan Term</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input class="field-in" id="loan-term" type="number" placeholder="e.g. 12" oninput="computeLoan()" style="flex:1">
+            <div style="display:flex;gap:6px">
+              <button class="ftab on" id="term-months" onclick="selTermUnit('months',this)" style="padding:8px 12px">Months</button>
+              <button class="ftab" id="term-years" onclick="selTermUnit('years',this)" style="padding:8px 12px">Years</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-grp">
+          <div class="field-lbl">Payment Frequency</div>
+          <div style="display:flex;gap:6px">
+            <button class="ftab on" onclick="selFreq('monthly',this)" id="freq-monthly">Monthly</button>
+            <button class="ftab" onclick="selFreq('semi',this)" id="freq-semi">Semi-monthly</button>
+            <button class="ftab" onclick="selFreq('weekly',this)" id="freq-weekly">Weekly</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results Card -->
+      <div id="loan-results" style="display:none">
+
+        <!-- Main result -->
+        <div class="net-card" style="margin-bottom:14px">
+          <div class="net-lbl" id="loan-payment-label">Monthly Payment</div>
+          <div class="net-amt pos" id="loan-payment">₱0</div>
+          <div class="net-chip" id="loan-payment-chip">Per month</div>
+          <div class="net-div"></div>
+          <div class="net-meta">
+            <div class="net-mi">
+              <div class="net-ml">Principal</div>
+              <div class="net-mv" id="lr-principal">₱0</div>
+            </div>
+            <div class="net-mi">
+              <div class="net-ml">Total Interest</div>
+              <div class="net-mv neg" id="lr-interest">₱0</div>
+            </div>
+            <div class="net-mi">
+              <div class="net-ml">Total Payment</div>
+              <div class="net-mv warn" id="lr-total">₱0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary stats -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+          <div class="sum-box">
+            <div class="sum-icon">📅</div>
+            <div class="sum-val warn" id="lr-payments">0</div>
+            <div class="sum-lbl">Total Payments</div>
+          </div>
+          <div class="sum-box">
+            <div class="sum-icon">📊</div>
+            <div class="sum-val neg" id="lr-interest-pct">0%</div>
+            <div class="sum-lbl">Interest of Total</div>
+          </div>
+          <div class="sum-box">
+            <div class="sum-icon">💰</div>
+            <div class="sum-val pos" id="lr-monthly-int">₱0</div>
+            <div class="sum-lbl">Monthly Interest</div>
+          </div>
+          <div class="sum-box">
+            <div class="sum-icon">⏱️</div>
+            <div class="sum-val info" id="lr-duration">0 months</div>
+            <div class="sum-lbl">Loan Duration</div>
+          </div>
+        </div>
+
+        <!-- Interest breakdown donut -->
+        <div class="card" style="margin-bottom:14px">
+          <div style="font-size:13px;font-weight:900;margin-bottom:12px">💡 Principal vs Interest</div>
+          <div style="display:flex;align-items:center;gap:16px">
+            <svg id="loan-donut" width="110" height="110" viewBox="0 0 110 110" style="flex-shrink:0"></svg>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                <div style="width:12px;height:12px;border-radius:50%;background:var(--acc)"></div>
+                <div style="flex:1;font-size:13px;font-weight:700">Principal</div>
+                <div style="font-size:13px;font-weight:900;color:var(--acc)" id="ld-principal-pct">0%</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="width:12px;height:12px;border-radius:50%;background:var(--acc4)"></div>
+                <div style="flex:1;font-size:13px;font-weight:700">Interest</div>
+                <div style="font-size:13px;font-weight:900;color:var(--acc4)" id="ld-interest-pct">0%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Amortization schedule toggle -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div class="sec-title" style="margin:0">📋 Amortization Schedule</div>
+          <div style="display:flex;gap:6px">
+            <button class="ftab on" id="amort-show-all" onclick="toggleAmort('all',this)">All</button>
+            <button class="ftab" id="amort-show-first" onclick="toggleAmort('first',this)">First 6</button>
+            <button class="ftab" id="amort-show-last" onclick="toggleAmort('last',this)">Last 6</button>
+          </div>
+        </div>
+
+        <div id="amort-table" style="overflow-x:auto">
+          <!-- filled by JS -->
+        </div>
+
+      </div><!-- end loan-results -->
+
+      <!-- Saved Loans -->
+      <div id="saved-loans-section" style="display:none">
+        <div class="sec-title" style="margin-top:16px">💾 Saved Loan Scenarios</div>
+        <div id="saved-loans-list"></div>
+      </div>
+
     </div>
   </div>
 
@@ -1889,6 +2053,319 @@ function loadLocal() {
     if (budgetData.goals && budgetData.goals.length) _goalId = Math.max(...budgetData.goals.map(x=>x.id)) + 1;
   } catch(e) { console.warn('Load failed:', e); }
 }
+
+// ── Quick Add Handler ────────────────────────
+function quickAdd(type) {
+  // Close quick modal first
+  document.getElementById('modal-quick').classList.remove('open');
+  
+  // Small delay then open the right form
+  setTimeout(() => {
+    if (type === 'expense') {
+      openScreen('expenses');
+      setTimeout(() => document.getElementById('modal-add-expense').classList.add('open'), 100);
+    } else if (type === 'income') {
+      document.getElementById('modal-add-income').classList.add('open');
+    } else if (type === 'debt') {
+      openScreen('debts');
+      setTimeout(() => document.getElementById('modal-add-debt').classList.add('open'), 100);
+    } else if (type === 'hulog') {
+      openScreen('hulog');
+      setTimeout(() => document.getElementById('modal-add-hulog').classList.add('open'), 100);
+    }
+  }, 200);
+}
+
+
+// ══════════════════════════════════════════════
+//  LOAN CALCULATOR
+// ══════════════════════════════════════════════
+let loanType    = 'personal';
+let termUnit    = 'months';
+let payFreq     = 'monthly';
+let amortView   = 'all';
+let savedLoans  = [];
+let _loanId     = 1;
+
+// Typical PH interest rates by loan type
+const LOAN_TYPE_RATES = {
+  personal: {rate: 24,  label: 'Typical PH: 24–36% p.a.'},
+  home:     {rate: 6.5, label: 'Typical PH: 5–8% p.a.'},
+  car:      {rate: 10,  label: 'Typical PH: 8–12% p.a.'},
+  salary:   {rate: 18,  label: 'SSS/GSIS: ~10–24% p.a.'},
+  business: {rate: 15,  label: 'Typical PH: 12–24% p.a.'},
+};
+
+function selLoanType(type, el) {
+  loanType = type;
+  document.querySelectorAll('#loan-type-btns .ftab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  // Suggest typical rate
+  const info = LOAN_TYPE_RATES[type];
+  if (info) {
+    document.getElementById('loan-rate').value = info.rate;
+    document.getElementById('loan-rate-hint').textContent = info.label;
+  }
+  computeLoan();
+}
+
+function selTermUnit(unit, el) {
+  termUnit = unit;
+  document.querySelectorAll('#loan-type-btns').forEach(()=>{});
+  document.getElementById('term-months').classList.toggle('on', unit==='months');
+  document.getElementById('term-years').classList.toggle('on', unit==='years');
+  computeLoan();
+}
+
+function selFreq(freq, el) {
+  payFreq = freq;
+  ['monthly','semi','weekly'].forEach(f => {
+    document.getElementById('freq-'+f).classList.toggle('on', f===freq);
+  });
+  computeLoan();
+}
+
+function toggleAmort(view, el) {
+  amortView = view;
+  ['all','first','last'].forEach(v => {
+    document.getElementById('amort-show-'+v).classList.toggle('on', v===view);
+  });
+  renderAmortTable(window._lastSchedule || []);
+}
+
+function computeLoan() {
+  const principal = parseFloat(document.getElementById('loan-amount').value) || 0;
+  const annualRate = parseFloat(document.getElementById('loan-rate').value) || 0;
+  const termVal   = parseFloat(document.getElementById('loan-term').value) || 0;
+  if (!principal || !annualRate || !termVal) {
+    document.getElementById('loan-results').style.display = 'none';
+    return;
+  }
+
+  // Convert term to months
+  const termMonths = termUnit === 'years' ? termVal * 12 : termVal;
+
+  // Frequency multiplier
+  let freqPerYear, freqLabel, freqChip;
+  if (payFreq === 'monthly')     { freqPerYear = 12;  freqLabel = 'Monthly Payment';      freqChip = 'Per month (12x/year)'; }
+  else if (payFreq === 'semi')   { freqPerYear = 24;  freqLabel = 'Semi-monthly Payment'; freqChip = 'Twice a month (24x/year)'; }
+  else                           { freqPerYear = 52;  freqLabel = 'Weekly Payment';       freqChip = 'Every week (52x/year)'; }
+
+  // Total payment periods
+  const totalPeriods = Math.round(termMonths / 12 * freqPerYear);
+
+  // Periodic interest rate
+  const periodicRate = annualRate / 100 / freqPerYear;
+
+  // Monthly payment using amortization formula: M = P[r(1+r)^n]/[(1+r)^n-1]
+  let periodicPayment;
+  if (periodicRate === 0) {
+    periodicPayment = principal / totalPeriods;
+  } else {
+    periodicPayment = principal * (periodicRate * Math.pow(1+periodicRate, totalPeriods)) /
+                      (Math.pow(1+periodicRate, totalPeriods) - 1);
+  }
+
+  const totalPayment  = periodicPayment * totalPeriods;
+  const totalInterest = totalPayment - principal;
+  const interestPct   = totalPayment > 0 ? Math.round(totalInterest / totalPayment * 100) : 0;
+  const principalPct  = 100 - interestPct;
+
+  // Monthly interest (for display)
+  const monthlyInterest = principal * (annualRate / 100 / 12);
+
+  // Duration label
+  const years  = Math.floor(termMonths / 12);
+  const months = termMonths % 12;
+  const durLabel = [years>0?years+'y':'', months>0?months+'mo':''].filter(Boolean).join(' ') || termMonths+'mo';
+
+  // Update UI
+  document.getElementById('loan-results').style.display = 'block';
+  document.getElementById('loan-payment-label').textContent = freqLabel;
+  document.getElementById('loan-payment').textContent       = fmt(Math.round(periodicPayment));
+  document.getElementById('loan-payment-chip').textContent  = freqChip;
+  document.getElementById('lr-principal').textContent       = fmt(principal);
+  document.getElementById('lr-interest').textContent        = fmt(Math.round(totalInterest));
+  document.getElementById('lr-total').textContent           = fmt(Math.round(totalPayment));
+  document.getElementById('lr-payments').textContent        = totalPeriods;
+  document.getElementById('lr-interest-pct').textContent    = interestPct + '%';
+  document.getElementById('lr-monthly-int').textContent     = fmt(Math.round(monthlyInterest));
+  document.getElementById('lr-duration').textContent        = durLabel;
+  document.getElementById('ld-principal-pct').textContent   = principalPct + '%';
+  document.getElementById('ld-interest-pct').textContent    = interestPct + '%';
+
+  // Draw donut
+  drawLoanDonut(principal, totalInterest);
+
+  // Build amortization schedule
+  const schedule = buildAmortSchedule(principal, periodicRate, periodicPayment, totalPeriods, payFreq);
+  window._lastSchedule = schedule;
+  renderAmortTable(schedule);
+
+  // Render saved loans
+  renderSavedLoans();
+}
+
+function drawLoanDonut(principal, interest) {
+  const svg    = document.getElementById('loan-donut');
+  const total  = principal + interest;
+  const cx=55, cy=55, r=44, sw=14, circ=2*Math.PI*r;
+  const principalDash = (principal/total) * circ;
+  const interestDash  = (interest/total)  * circ;
+  svg.innerHTML = `
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--surf2)" stroke-width="${sw}"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--acc)" stroke-width="${sw}"
+      stroke-dasharray="${principalDash.toFixed(1)} ${(circ-principalDash).toFixed(1)}"
+      stroke-linecap="round" transform="rotate(-90 ${cx} ${cy})"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--acc4)" stroke-width="${sw}"
+      stroke-dasharray="${interestDash.toFixed(1)} ${(circ-interestDash).toFixed(1)}"
+      stroke-linecap="round" transform="rotate(${(-90 + (principal/total)*360).toFixed(1)} ${cx} ${cy})"/>
+    <text x="${cx}" y="${cy-4}" text-anchor="middle" fill="var(--txt)" font-size="10" font-weight="900" font-family="Nunito,sans-serif">${fmt(Math.round((principal+interest)/1000)*1000).replace('₱','₱')}</text>
+    <text x="${cx}" y="${cy+10}" text-anchor="middle" fill="var(--mut)" font-size="8" font-family="Nunito,sans-serif">total</text>`;
+}
+
+function buildAmortSchedule(principal, periodicRate, payment, periods, freq) {
+  const schedule = [];
+  let balance = principal;
+  const periodLabel = freq==='monthly'?'Month':freq==='semi'?'Period':'Week';
+
+  for (let i=1; i<=periods; i++) {
+    const interestPaid  = balance * periodicRate;
+    const principalPaid = payment - interestPaid;
+    balance = Math.max(0, balance - principalPaid);
+    schedule.push({
+      period:    i,
+      label:     periodLabel + ' ' + i,
+      payment:   Math.round(payment),
+      principal: Math.round(principalPaid),
+      interest:  Math.round(interestPaid),
+      balance:   Math.round(balance),
+    });
+  }
+  return schedule;
+}
+
+function renderAmortTable(schedule) {
+  if (!schedule.length) return;
+  let rows;
+  if (amortView === 'first')     rows = schedule.slice(0, 6);
+  else if (amortView === 'last') rows = schedule.slice(-6);
+  else                           rows = schedule;
+
+  const totalRows = schedule.length;
+  const tableEl   = document.getElementById('amort-table');
+
+  tableEl.innerHTML = `
+    <div style="font-size:11px;color:var(--mut2);margin-bottom:8px">${totalRows} payment periods total</div>
+    <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead>
+        <tr style="background:var(--surf2)">
+          <th style="padding:8px 6px;text-align:left;font-weight:900;color:var(--mut);font-size:10px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap">Period</th>
+          <th style="padding:8px 6px;text-align:right;font-weight:900;color:var(--mut);font-size:10px;text-transform:uppercase;letter-spacing:.5px">Payment</th>
+          <th style="padding:8px 6px;text-align:right;font-weight:900;color:var(--mut);font-size:10px;text-transform:uppercase;letter-spacing:.5px">Principal</th>
+          <th style="padding:8px 6px;text-align:right;font-weight:900;color:var(--mut);font-size:10px;text-transform:uppercase;letter-spacing:.5px">Interest</th>
+          <th style="padding:8px 6px;text-align:right;font-weight:900;color:var(--mut);font-size:10px;text-transform:uppercase;letter-spacing:.5px">Balance</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map((r,i) => `
+          <tr style="border-bottom:1px solid var(--bdr);${i%2===0?'background:rgba(255,255,255,0.02)':''}">
+            <td style="padding:8px 6px;font-weight:700;color:var(--txt)">${r.label}</td>
+            <td style="padding:8px 6px;text-align:right;font-weight:900;color:var(--acc)">${fmt(r.payment)}</td>
+            <td style="padding:8px 6px;text-align:right;color:var(--acc2)">${fmt(r.principal)}</td>
+            <td style="padding:8px 6px;text-align:right;color:var(--acc4)">${fmt(r.interest)}</td>
+            <td style="padding:8px 6px;text-align:right;font-weight:700;color:var(--txt)">${fmt(r.balance)}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+    </div>
+    ${amortView !== 'all' && totalRows > 6 ? `<div style="text-align:center;margin-top:10px;font-size:11px;color:var(--mut2)">Showing ${rows.length} of ${totalRows} periods — tap "All" to see full schedule</div>` : ''}
+  `;
+}
+
+function saveLoanResult() {
+  const principal = parseFloat(document.getElementById('loan-amount').value) || 0;
+  const rate      = parseFloat(document.getElementById('loan-rate').value) || 0;
+  const term      = parseFloat(document.getElementById('loan-term').value) || 0;
+  if (!principal || !rate || !term) return toast('⚠️ Fill in loan details first');
+
+  const payment = document.getElementById('loan-payment').textContent;
+  const total   = document.getElementById('lr-total').textContent;
+  const interest= document.getElementById('lr-interest').textContent;
+  const label   = loanType.charAt(0).toUpperCase()+loanType.slice(1) + ' Loan — ' + fmt(principal);
+
+  savedLoans.unshift({
+    id: _loanId++, label, principal, rate, term, termUnit,
+    freq: payFreq, payment, total, interest, type: loanType,
+    savedAt: new Date().toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'})
+  });
+
+  try { localStorage.setItem('bb-loans', JSON.stringify(savedLoans)); } catch(e){}
+  renderSavedLoans();
+  toast('💾 Loan scenario saved!');
+}
+
+function deleteSavedLoan(id) {
+  savedLoans = savedLoans.filter(l=>l.id!==id);
+  try { localStorage.setItem('bb-loans', JSON.stringify(savedLoans)); } catch(e){}
+  renderSavedLoans();
+  toast('🗑️ Deleted');
+}
+
+function loadSavedLoan(id) {
+  const l = savedLoans.find(x=>x.id===id);
+  if (!l) return;
+  document.getElementById('loan-amount').value = l.principal;
+  document.getElementById('loan-rate').value   = l.rate;
+  document.getElementById('loan-term').value   = l.term;
+  termUnit = l.termUnit || 'months';
+  payFreq  = l.freq || 'monthly';
+  document.getElementById('term-months').classList.toggle('on', termUnit==='months');
+  document.getElementById('term-years').classList.toggle('on',  termUnit==='years');
+  ['monthly','semi','weekly'].forEach(f => document.getElementById('freq-'+f).classList.toggle('on', f===payFreq));
+  computeLoan();
+  toast('📂 Loan loaded!');
+}
+
+function renderSavedLoans() {
+  // Load from storage if empty
+  if (!savedLoans.length) {
+    try { const s=localStorage.getItem('bb-loans'); if(s) savedLoans=JSON.parse(s); } catch(e){}
+  }
+  const section = document.getElementById('saved-loans-section');
+  const list    = document.getElementById('saved-loans-list');
+  if (!savedLoans.length) { section.style.display='none'; return; }
+  section.style.display = 'block';
+  list.innerHTML = savedLoans.map(l => `
+    <div class="card" style="margin-bottom:8px">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <div style="width:38px;height:38px;border-radius:12px;background:rgba(107,163,214,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🏦</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:900;color:var(--txt);margin-bottom:2px">${l.label}</div>
+          <div style="font-size:11px;color:var(--mut2)">${l.rate}% · ${l.term} ${l.termUnit} · ${l.freq} · Saved ${l.savedAt}</div>
+          <div style="display:flex;gap:12px;margin-top:8px">
+            <div><div style="font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;font-weight:700">Payment</div><div style="font-size:14px;font-weight:900;color:var(--acc)">${l.payment}</div></div>
+            <div><div style="font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;font-weight:700">Total</div><div style="font-size:14px;font-weight:900;color:var(--acc3)">${l.total}</div></div>
+            <div><div style="font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;font-weight:700">Interest</div><div style="font-size:14px;font-weight:900;color:var(--acc4)">${l.interest}</div></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+          <button class="sm-btn sm-btn-acc" onclick="loadSavedLoan(${l.id})" style="font-size:11px">📂 Load</button>
+          <button class="sm-btn sm-btn-ghost" onclick="deleteSavedLoan(${l.id})" style="font-size:11px">🗑️</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// Load saved loans on init
+window.addEventListener('DOMContentLoaded', () => {
+  try {
+    const s = localStorage.getItem('bb-loans');
+    if (s) savedLoans = JSON.parse(s);
+  } catch(e) {}
+});
+
 
 function toast(msg) {
   const existing = document.querySelector('.toast');
