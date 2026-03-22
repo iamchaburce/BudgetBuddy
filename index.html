@@ -52,8 +52,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);min-
 /* ── HEADER ─────────────────────────────── */
 .hdr{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--bdr);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;backdrop-filter:blur(20px)}
 .logo{display:flex;align-items:center;gap:10px}
-.logo-icon{width:36px;height:36px;background:var(--acc);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--bg)}
-.logo-txt{font-size:17px;font-weight:800;font-family:'Syne',sans-serif;letter-spacing:-0.3px;line-height:1}
+.logo-icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-txt{font-size:17px;font-weight:800;font-family:'Syne',sans-serif;letter-spacing:-0.3px;line-height:1;color:var(--txt)}
+.logo-product{font-size:11px;font-weight:500;color:var(--mut2);font-family:'DM Sans',sans-serif;letter-spacing:0;vertical-align:middle;margin-left:2px}
 .logo-txt span{color:var(--acc)}
 .hdr-acts{display:flex;gap:8px;align-items:center}
 .icon-btn{width:36px;height:36px;border-radius:12px;background:var(--surf2);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .2s;position:relative}
@@ -373,8 +374,18 @@ h1, h2, h3, .section-title-syne { font-family: 'Syne', sans-serif !important; }
   <!-- HEADER -->
   <div class="hdr">
     <div class="logo">
-      <div class="logo-icon" style="font-family:'Syne',sans-serif;letter-spacing:-1px;font-size:14px;font-weight:800">FK</div>
-      <div class="logo-txt">Formula<span>Ko</span> <span style="font-size:13px;color:var(--mut2);font-family:'DM Sans',sans-serif;font-weight:500;letter-spacing:0">BudgetBuddy</span></div>
+      <svg width="32" height="32" viewBox="0 0 32 32" style="flex-shrink:0">
+  <rect x="1" y="1" width="8" height="8" rx="2.5" fill="#22C483"/>
+  <rect x="12" y="1" width="8" height="8" rx="2.5" fill="#22C483" opacity="0.8"/>
+  <rect x="23" y="1" width="8" height="8" rx="2.5" fill="#22C483" opacity="0.6"/>
+  <rect x="1" y="12" width="8" height="8" rx="2.5" fill="#22C483" opacity="0.7"/>
+  <rect x="12" y="12" width="8" height="8" rx="2.5" fill="#F5D070"/>
+  <rect x="23" y="12" width="8" height="8" rx="2.5" fill="#22C483" opacity="0.3"/>
+  <rect x="1" y="23" width="8" height="8" rx="2.5" fill="#22C483" opacity="0.5"/>
+  <rect x="12" y="23" width="8" height="8" rx="2.5" fill="#22C483" opacity="0.25"/>
+  <rect x="23" y="23" width="8" height="8" rx="2.5" fill="#F5D070" opacity="0.5"/>
+</svg>
+      <div class="logo-txt">Formula<span style="color:#F5D070">Ko</span><span class="logo-product"> BudgetBuddy</span></div>
     </div>
     <div class="hdr-acts">
       <div class="icon-btn" id="pdf-btn" title="Export PDF" onclick="exportPDF()">📄</div>
@@ -918,7 +929,21 @@ h1, h2, h3, .section-title-syne { font-family: 'Syne', sans-serif !important; }
   <!-- Setup Modal -->
   <div class="setup-modal" id="setup-modal">
     <div class="setup-box">
-      <h2 style="font-family:'Syne',sans-serif">👋 Welcome to FormulaKo!</h2>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <svg width="28" height="28" viewBox="0 0 32 32">
+        <rect x="1" y="1" width="8" height="8" rx="2.5" fill="#22C483"/>
+        <rect x="12" y="1" width="8" height="8" rx="2.5" fill="#22C483" opacity="0.8"/>
+        <rect x="23" y="1" width="8" height="8" rx="2.5" fill="#22C483" opacity="0.6"/>
+        <rect x="1" y="12" width="8" height="8" rx="2.5" fill="#22C483" opacity="0.7"/>
+        <rect x="12" y="12" width="8" height="8" rx="2.5" fill="#F5D070"/>
+        <rect x="23" y="12" width="8" height="8" rx="2.5" fill="#22C483" opacity="0.3"/>
+        <rect x="1" y="23" width="8" height="8" rx="2.5" fill="#22C483" opacity="0.5"/>
+        <rect x="12" y="23" width="8" height="8" rx="2.5" fill="#22C483" opacity="0.25"/>
+        <rect x="23" y="23" width="8" height="8" rx="2.5" fill="#F5D070" opacity="0.5"/>
+      </svg>
+      <h2 style="font-family:'Syne',sans-serif">Formula<span style="color:#F5D070">Ko</span></h2>
+    </div>
+    <p style="font-size:11px;color:var(--mut2);margin-bottom:4px;font-family:'DM Sans',sans-serif">Your formula for everything.</p>
       <p>Welcome to <strong>FormulaKo BudgetBuddy</strong> — your personal finance app. First, who are you?</p>
       <div class="user-toggle" style="margin-bottom:20px">
         <button class="user-btn on-cha" id="su-cha" onclick="selSetupUser('Cha')">👩 Cha</button>
@@ -935,7 +960,19 @@ h1, h2, h3, .section-title-syne { font-family: 'Syne', sans-serif !important; }
 
   <!-- PWA Install Banner -->
   <div class="pwa-banner" id="pwa-banner">
-    <div class="pwa-icon">₱</div>
+    <div class="pwa-icon" style="background:#0A0C0A;padding:6px">
+      <svg width="30" height="30" viewBox="0 0 32 32">
+        <rect x="1" y="1" width="8" height="8" rx="2.5" fill="#22C483"/>
+        <rect x="12" y="1" width="8" height="8" rx="2.5" fill="#22C483" opacity="0.8"/>
+        <rect x="23" y="1" width="8" height="8" rx="2.5" fill="#22C483" opacity="0.6"/>
+        <rect x="1" y="12" width="8" height="8" rx="2.5" fill="#22C483" opacity="0.7"/>
+        <rect x="12" y="12" width="8" height="8" rx="2.5" fill="#F5D070"/>
+        <rect x="23" y="12" width="8" height="8" rx="2.5" fill="#22C483" opacity="0.3"/>
+        <rect x="1" y="23" width="8" height="8" rx="2.5" fill="#22C483" opacity="0.5"/>
+        <rect x="12" y="23" width="8" height="8" rx="2.5" fill="#22C483" opacity="0.25"/>
+        <rect x="23" y="23" width="8" height="8" rx="2.5" fill="#F5D070" opacity="0.5"/>
+      </svg>
+    </div>
     <div class="pwa-txt"><div class="pwa-title">Add FormulaKo to Home Screen</div><div class="pwa-sub">Works offline!</div></div>
     <button class="pwa-btn" id="pwa-install-btn">Install</button>
     <button class="pwa-close" onclick="dismissPWA()">✕</button>
