@@ -87,6 +87,93 @@
   .ct-label { font-size: 12px; font-weight: 700; color: var(--muted2); }
   .ct-val { font-size: 16px; font-weight: 900; }
 
+
+  /* ══ NOTIFICATIONS & DUE ALERTS ══ */
+  .due-overlay {
+    position: fixed; inset: 0; z-index: 550;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+    display: none; align-items: flex-end; justify-content: center;
+  }
+  .due-overlay.show { display: flex; }
+  .due-sheet {
+    width: 100%; max-width: 420px;
+    background: var(--surface);
+    border-radius: 28px 28px 0 0;
+    border-top: 1px solid var(--border);
+    padding: 20px 20px 44px;
+    max-height: 85vh; overflow-y: auto;
+    animation: slideUp 0.35s cubic-bezier(0.34,1.2,0.64,1);
+  }
+  .due-sheet-handle {
+    width: 36px; height: 4px; background: var(--border);
+    border-radius: 2px; margin: 0 auto 16px;
+  }
+  .due-sheet-title {
+    font-size: 18px; font-weight: 900; color: var(--text);
+    margin-bottom: 4px;
+  }
+  .due-sheet-sub {
+    font-size: 12px; color: var(--muted2); margin-bottom: 18px;
+  }
+
+  .due-alert-item {
+    background: var(--surface2); border-radius: 16px;
+    padding: 14px; margin-bottom: 8px;
+    border-left: 4px solid var(--accent3);
+    display: flex; gap: 12px; align-items: center;
+  }
+  .due-alert-item.overdue  { border-left-color: var(--accent4); }
+  .due-alert-item.critical { border-left-color: var(--accent4);
+    background: rgba(224,123,138,0.08); }
+  .due-alert-item.upcoming { border-left-color: var(--accent3); }
+  .due-alert-item.soon     { border-left-color: var(--accent2); }
+
+  .dai-icon {
+    width: 40px; height: 40px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .dai-info { flex: 1; min-width: 0; }
+  .dai-name { font-size: 13px; font-weight: 900; color: var(--text); margin-bottom: 2px; }
+  .dai-meta { font-size: 11px; color: var(--muted2); }
+  .dai-right { text-align: right; flex-shrink: 0; }
+  .dai-amount { font-size: 14px; font-weight: 900; margin-bottom: 2px; }
+  .dai-days { font-size: 10px; font-weight: 900; text-transform: uppercase;
+    letter-spacing: 0.5px; padding: 2px 8px; border-radius: 20px; }
+  .days-overdue  { background: rgba(224,123,138,0.2); color: var(--accent4); }
+  .days-today    { background: rgba(224,123,138,0.2); color: var(--accent4); }
+  .days-soon     { background: rgba(232,184,109,0.2); color: var(--accent3); }
+  .days-upcoming { background: rgba(107,163,214,0.2); color: var(--accent2); }
+
+  /* Notification bell badge */
+  .notif-badge {
+    position: absolute; top: -4px; right: -4px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--accent4); color: #fff;
+    font-size: 9px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  .notif-btn-wrap { position: relative; display: inline-flex; }
+
+  /* Due soon banner on dashboard */
+  .due-banner {
+    background: linear-gradient(135deg, rgba(232,184,109,0.15), rgba(224,123,138,0.1));
+    border: 1px solid var(--accent3);
+    border-radius: 18px; padding: 14px 16px;
+    margin-bottom: 14px; cursor: pointer;
+    transition: all 0.2s; display: none;
+  }
+  .due-banner.show { display: block; }
+  .due-banner:active { transform: scale(0.98); }
+  .due-banner-title { font-size: 13px; font-weight: 900; color: var(--text);
+    margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .due-banner-items { display: flex; flex-direction: column; gap: 4px; }
+  .dbi { font-size: 11px; color: var(--muted2); display: flex;
+    justify-content: space-between; }
+  .dbi-name { font-weight: 700; color: var(--text); }
+
 </style>
 <style>
   /* Offline fallback in case Google Fonts fails */
@@ -158,6 +245,93 @@
   }
   .ct-label { font-size: 12px; font-weight: 700; color: var(--muted2); }
   .ct-val { font-size: 16px; font-weight: 900; }
+
+
+  /* ══ NOTIFICATIONS & DUE ALERTS ══ */
+  .due-overlay {
+    position: fixed; inset: 0; z-index: 550;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+    display: none; align-items: flex-end; justify-content: center;
+  }
+  .due-overlay.show { display: flex; }
+  .due-sheet {
+    width: 100%; max-width: 420px;
+    background: var(--surface);
+    border-radius: 28px 28px 0 0;
+    border-top: 1px solid var(--border);
+    padding: 20px 20px 44px;
+    max-height: 85vh; overflow-y: auto;
+    animation: slideUp 0.35s cubic-bezier(0.34,1.2,0.64,1);
+  }
+  .due-sheet-handle {
+    width: 36px; height: 4px; background: var(--border);
+    border-radius: 2px; margin: 0 auto 16px;
+  }
+  .due-sheet-title {
+    font-size: 18px; font-weight: 900; color: var(--text);
+    margin-bottom: 4px;
+  }
+  .due-sheet-sub {
+    font-size: 12px; color: var(--muted2); margin-bottom: 18px;
+  }
+
+  .due-alert-item {
+    background: var(--surface2); border-radius: 16px;
+    padding: 14px; margin-bottom: 8px;
+    border-left: 4px solid var(--accent3);
+    display: flex; gap: 12px; align-items: center;
+  }
+  .due-alert-item.overdue  { border-left-color: var(--accent4); }
+  .due-alert-item.critical { border-left-color: var(--accent4);
+    background: rgba(224,123,138,0.08); }
+  .due-alert-item.upcoming { border-left-color: var(--accent3); }
+  .due-alert-item.soon     { border-left-color: var(--accent2); }
+
+  .dai-icon {
+    width: 40px; height: 40px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .dai-info { flex: 1; min-width: 0; }
+  .dai-name { font-size: 13px; font-weight: 900; color: var(--text); margin-bottom: 2px; }
+  .dai-meta { font-size: 11px; color: var(--muted2); }
+  .dai-right { text-align: right; flex-shrink: 0; }
+  .dai-amount { font-size: 14px; font-weight: 900; margin-bottom: 2px; }
+  .dai-days { font-size: 10px; font-weight: 900; text-transform: uppercase;
+    letter-spacing: 0.5px; padding: 2px 8px; border-radius: 20px; }
+  .days-overdue  { background: rgba(224,123,138,0.2); color: var(--accent4); }
+  .days-today    { background: rgba(224,123,138,0.2); color: var(--accent4); }
+  .days-soon     { background: rgba(232,184,109,0.2); color: var(--accent3); }
+  .days-upcoming { background: rgba(107,163,214,0.2); color: var(--accent2); }
+
+  /* Notification bell badge */
+  .notif-badge {
+    position: absolute; top: -4px; right: -4px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--accent4); color: #fff;
+    font-size: 9px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  .notif-btn-wrap { position: relative; display: inline-flex; }
+
+  /* Due soon banner on dashboard */
+  .due-banner {
+    background: linear-gradient(135deg, rgba(232,184,109,0.15), rgba(224,123,138,0.1));
+    border: 1px solid var(--accent3);
+    border-radius: 18px; padding: 14px 16px;
+    margin-bottom: 14px; cursor: pointer;
+    transition: all 0.2s; display: none;
+  }
+  .due-banner.show { display: block; }
+  .due-banner:active { transform: scale(0.98); }
+  .due-banner-title { font-size: 13px; font-weight: 900; color: var(--text);
+    margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .due-banner-items { display: flex; flex-direction: column; gap: 4px; }
+  .dbi { font-size: 11px; color: var(--muted2); display: flex;
+    justify-content: space-between; }
+  .dbi-name { font-weight: 700; color: var(--text); }
 
 </style>
 <style>
@@ -1725,6 +1899,93 @@
   .ct-label { font-size: 12px; font-weight: 700; color: var(--muted2); }
   .ct-val { font-size: 16px; font-weight: 900; }
 
+
+  /* ══ NOTIFICATIONS & DUE ALERTS ══ */
+  .due-overlay {
+    position: fixed; inset: 0; z-index: 550;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+    display: none; align-items: flex-end; justify-content: center;
+  }
+  .due-overlay.show { display: flex; }
+  .due-sheet {
+    width: 100%; max-width: 420px;
+    background: var(--surface);
+    border-radius: 28px 28px 0 0;
+    border-top: 1px solid var(--border);
+    padding: 20px 20px 44px;
+    max-height: 85vh; overflow-y: auto;
+    animation: slideUp 0.35s cubic-bezier(0.34,1.2,0.64,1);
+  }
+  .due-sheet-handle {
+    width: 36px; height: 4px; background: var(--border);
+    border-radius: 2px; margin: 0 auto 16px;
+  }
+  .due-sheet-title {
+    font-size: 18px; font-weight: 900; color: var(--text);
+    margin-bottom: 4px;
+  }
+  .due-sheet-sub {
+    font-size: 12px; color: var(--muted2); margin-bottom: 18px;
+  }
+
+  .due-alert-item {
+    background: var(--surface2); border-radius: 16px;
+    padding: 14px; margin-bottom: 8px;
+    border-left: 4px solid var(--accent3);
+    display: flex; gap: 12px; align-items: center;
+  }
+  .due-alert-item.overdue  { border-left-color: var(--accent4); }
+  .due-alert-item.critical { border-left-color: var(--accent4);
+    background: rgba(224,123,138,0.08); }
+  .due-alert-item.upcoming { border-left-color: var(--accent3); }
+  .due-alert-item.soon     { border-left-color: var(--accent2); }
+
+  .dai-icon {
+    width: 40px; height: 40px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .dai-info { flex: 1; min-width: 0; }
+  .dai-name { font-size: 13px; font-weight: 900; color: var(--text); margin-bottom: 2px; }
+  .dai-meta { font-size: 11px; color: var(--muted2); }
+  .dai-right { text-align: right; flex-shrink: 0; }
+  .dai-amount { font-size: 14px; font-weight: 900; margin-bottom: 2px; }
+  .dai-days { font-size: 10px; font-weight: 900; text-transform: uppercase;
+    letter-spacing: 0.5px; padding: 2px 8px; border-radius: 20px; }
+  .days-overdue  { background: rgba(224,123,138,0.2); color: var(--accent4); }
+  .days-today    { background: rgba(224,123,138,0.2); color: var(--accent4); }
+  .days-soon     { background: rgba(232,184,109,0.2); color: var(--accent3); }
+  .days-upcoming { background: rgba(107,163,214,0.2); color: var(--accent2); }
+
+  /* Notification bell badge */
+  .notif-badge {
+    position: absolute; top: -4px; right: -4px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--accent4); color: #fff;
+    font-size: 9px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  .notif-btn-wrap { position: relative; display: inline-flex; }
+
+  /* Due soon banner on dashboard */
+  .due-banner {
+    background: linear-gradient(135deg, rgba(232,184,109,0.15), rgba(224,123,138,0.1));
+    border: 1px solid var(--accent3);
+    border-radius: 18px; padding: 14px 16px;
+    margin-bottom: 14px; cursor: pointer;
+    transition: all 0.2s; display: none;
+  }
+  .due-banner.show { display: block; }
+  .due-banner:active { transform: scale(0.98); }
+  .due-banner-title { font-size: 13px; font-weight: 900; color: var(--text);
+    margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .due-banner-items { display: flex; flex-direction: column; gap: 4px; }
+  .dbi { font-size: 11px; color: var(--muted2); display: flex;
+    justify-content: space-between; }
+  .dbi-name { font-weight: 700; color: var(--text); }
+
 </style>
 </head>
 <body>
@@ -1750,6 +2011,15 @@
   <div class="content">
 
     <!-- Greeting -->
+<!-- Due Soon Banner (dashboard) -->
+    <div class="due-banner" id="due-banner" onclick="openDueSheet()">
+      <div class="due-banner-title">
+        <span>⚠️</span>
+        <span id="due-banner-title">You have upcoming dues</span>
+      </div>
+      <div class="due-banner-items" id="due-banner-items"></div>
+    </div>
+
     <div class="greeting">
       <div class="greeting-sub">Saturday, March 21</div>
       <div class="greeting-main">Good day! How's your <span>money</span>? 😊</div>
@@ -2506,6 +2776,17 @@
       <button class="submit-btn" onclick="finishSetup()" style="margin-top:8px">
         Let's go! 🚀
       </button>
+    </div>
+  </div>
+
+
+  <!-- Due Alerts Sheet -->
+  <div class="due-overlay" id="dueOverlay" onclick="closeDueSheet(event)">
+    <div class="due-sheet">
+      <div class="due-sheet-handle"></div>
+      <div class="due-sheet-title">🔔 Upcoming Due Dates</div>
+      <div class="due-sheet-sub" id="due-sheet-sub">Checking your schedule...</div>
+      <div id="due-alerts-list"></div>
     </div>
   </div>
 
@@ -3443,31 +3724,42 @@
   });
 
 
-  // ══ SHARED / SYNC SYSTEM ══
-  let currentUser = localStorage.getItem('bb-user') || '';
-  let scriptUrl   = localStorage.getItem('bb-script-url') || '';
-  let expUser     = currentUser || 'Cha';
-  let isSyncing   = false;
+  // ══════════════════════════════════════════
+  //   SHARED / SYNC SYSTEM — True 2-way
+  // ══════════════════════════════════════════
+  let currentUser  = localStorage.getItem('bb-user') || '';
+  let scriptUrl    = localStorage.getItem('bb-script-url') || '';
+  let expUser      = currentUser || 'Cha';
+  let isSyncing    = false;
+  let syncInterval = null;
+  let lastSyncTime = 0;
 
-  // Show setup modal on first visit
+  // ── Show setup on first visit ─────────────
   window.addEventListener('DOMContentLoaded', () => {
     if (!currentUser) {
       setTimeout(() => document.getElementById('setupModal').classList.add('show'), 800);
     }
-    // Add combined summary to dashboard
     renderCombinedSummary();
+    selectExpUser(currentUser || 'Cha');
+    if (scriptUrl) {
+      syncFromCloud();
+      startAutoSync();
+    }
   });
 
+  // ── User selection ────────────────────────
   function selectUser(user) {
     expUser = user;
-    document.getElementById('setup-cha').className     = 'user-btn' + (user==='Cha'     ? ' active-cha'     : '');
-    document.getElementById('setup-chad').className = 'user-btn' + (user==='Chad' ? ' active-chad'  : '');
+    document.getElementById('setup-cha').className    = 'user-btn' + (user==='Cha'  ? ' active-cha'  : '');
+    document.getElementById('setup-chad').className   = 'user-btn' + (user==='Chad' ? ' active-chad' : '');
   }
 
   function selectExpUser(user) {
     expUser = user;
-    document.getElementById('exp-user-cha').className     = 'user-btn' + (user==='Cha'     ? ' active-cha'     : '');
-    document.getElementById('exp-user-chad').className = 'user-btn' + (user==='Chad' ? ' active-chad'  : '');
+    const chaEl  = document.getElementById('exp-user-cha');
+    const chadEl = document.getElementById('exp-user-chad');
+    if (chaEl)  chaEl.className  = 'user-btn' + (user==='Cha'  ? ' active-cha'  : '');
+    if (chadEl) chadEl.className = 'user-btn' + (user==='Chad' ? ' active-chad' : '');
   }
 
   function finishSetup() {
@@ -3479,163 +3771,752 @@
     if (scriptUrl) localStorage.setItem('bb-script-url', scriptUrl);
     document.getElementById('setupModal').classList.remove('show');
     showToast('👋 Welcome, ' + currentUser + '!');
-    if (scriptUrl) syncFromCloud();
+    if (scriptUrl) { syncFromCloud(); startAutoSync(); }
   }
 
-  // ── Sync Bar ──────────────────────────────────────────
-  function showSyncBar(msg, type = '') {
+  // ── Sync bar ──────────────────────────────
+  function showSyncBar(msg, type='') {
     const bar = document.getElementById('syncBar');
     const msgEl = document.getElementById('syncMsg');
-    bar.className = 'sync-bar show' + (type ? ' ' + type : '');
+    if (!bar) return;
+    bar.className = 'sync-bar show' + (type ? ' '+type : '');
     msgEl.textContent = msg;
     if (type !== 'syncing') setTimeout(() => bar.classList.remove('show'), 3000);
   }
 
-  // ── Push to Google Sheets ─────────────────────────────
+  // ── Auto-sync every 30s ───────────────────
+  function startAutoSync() {
+    if (syncInterval) clearInterval(syncInterval);
+    syncInterval = setInterval(() => {
+      const now = Date.now();
+      if (now - lastSyncTime > 28000) syncFromCloud(true);
+    }, 30000);
+  }
+
+  // ── PUSH to Google Sheets ─────────────────
   async function pushToCloud(action, data) {
     if (!scriptUrl) return;
     try {
-      const payload = { action, data: { ...data, addedby: currentUser } };
-      const res = await fetch(scriptUrl, {
+      showSyncBar('⬆️ Saving...', 'syncing');
+      await fetch(scriptUrl, {
         method: 'POST',
+        mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        mode: 'no-cors'
+        body: JSON.stringify({ action, data: { ...data, addedby: currentUser } })
       });
-      showSyncBar('✅ Saved to cloud!');
-    } catch (e) {
-      showSyncBar('⚠️ Offline — saved locally', 'error');
+      showSyncBar('✅ Saved to Google Sheets!');
+      lastSyncTime = Date.now();
+    } catch(e) {
+      showSyncBar('⚠️ Offline — saved locally only', 'error');
     }
   }
 
-  // ── Pull from Google Sheets ───────────────────────────
-  async function syncFromCloud() {
+  // ── PULL from Google Sheets (2-way) ───────
+  async function syncFromCloud(silent=false) {
     if (!scriptUrl || isSyncing) return;
     isSyncing = true;
-    showSyncBar('⟳ Syncing...', 'syncing');
+    if (!silent) showSyncBar('⟳ Syncing with Google Sheets...', 'syncing');
     try {
-      const res  = await fetch(scriptUrl + '?action=getAll');
+      const res  = await fetch(scriptUrl + '?action=getAll&t=' + Date.now());
       const json = await res.json();
       if (json.success && json.data) {
         const d = json.data;
+
+        // ── Merge Expenses ──
         if (d.expenses && d.expenses.length) {
-          expenses = d.expenses.map(e => ({
-            id: e.id, cat: e.category, desc: e.description,
-            amount: parseFloat(e.amount)||0, date: e.date,
-            addedBy: e.addedby || ''
+          expenses = d.expenses.map((e,i) => ({
+            id:      parseInt(e.id) || (i+1),
+            cat:     (e.category||'others').toLowerCase(),
+            desc:    e.description || '',
+            amount:  parseFloat(e.amount) || 0,
+            date:    e.date || '',
+            addedBy: e.addedby || '',
           }));
+          renderExpenses();
         }
+
+        // ── Merge Income ──
         if (d.income && d.income.length) {
-          // merge into budgetData
+          const currentMonth = new Date().toISOString().slice(0,7);
+          const monthIncome = d.income.filter(i => i.month === currentMonth);
+          if (monthIncome.length) {
+            budgetData.income = monthIncome.map((i,idx) => ({
+              id:     parseInt(i.id) || (idx+1),
+              type:   i.type || 'other',
+              desc:   i.description || '',
+              amount: parseFloat(i.amount) || 0,
+            }));
+            renderBudget();
+          }
         }
-        renderExpenses();
+
+        // ── Merge Debts ──
+        if (d.debts && d.debts.length) {
+          debts = d.debts.map((d2,i) => ({
+            id:       parseInt(d2.id) || (i+1),
+            type:     d2.type || 'oweme',
+            name:     d2.name || '',
+            amount:   parseFloat(d2.amount) || 0,
+            paid:     parseFloat(d2.paid) || 0,
+            due:      d2.duedate || '',
+            notes:    d2.notes || '',
+            settled:  d2.settled === true || d2.settled === 'TRUE',
+            addedBy:  d2.addedby || '',
+          }));
+          renderDebts();
+        }
+
+        // ── Merge Hulogs ──
+        if (d.hulog && d.hulog.length) {
+          hulogs = d.hulog.map((h,i) => ({
+            id:          parseInt(h.id) || (i+1),
+            type:        h.type || 'others',
+            name:        h.name || '',
+            store:       h.store || '',
+            amount:      parseFloat(h.total) || 0,
+            monthly:     parseFloat(h.monthly) || 0,
+            paidMonths:  parseInt(h.paidmonths) || 0,
+            totalMonths: parseInt(h.totalmonths) || 0,
+            nextDue:     h.nextdue || '',
+            done:        h.done === true || h.done === 'TRUE',
+          }));
+          renderHulogs();
+        }
+
         renderCombinedSummary();
-        showSyncBar('✅ Synced with ' + (currentUser === 'Cha' ? 'Chad' : 'Cha') + ''s data!');
+        lastSyncTime = Date.now();
+        if (!silent) showSyncBar('✅ Synced! ' + new Date().toLocaleTimeString('en-PH', {hour:'2-digit',minute:'2-digit'}));
       }
-    } catch (e) {
-      showSyncBar('⚠️ Could not sync — check connection', 'error');
+    } catch(e) {
+      if (!silent) showSyncBar('⚠️ Sync failed — check connection', 'error');
     }
     isSyncing = false;
   }
 
-  // ── Combined Summary Card ─────────────────────────────
+  // ── Combined Summary ──────────────────────
   function renderCombinedSummary() {
-    const currentMonth = new Date().toISOString().slice(0, 7);
-    const chaExp = expenses
-      .filter(e => e.date && e.date.startsWith(currentMonth) && e.addedBy === 'Cha')
-      .reduce((s,e) => s + e.amount, 0);
-    const hubExp = expenses
-      .filter(e => e.date && e.date.startsWith(currentMonth) && e.addedBy === 'Chad')
-      .reduce((s,e) => s + e.amount, 0);
-    const total = chaExp + hubExp;
+    const currentMonth = new Date().toISOString().slice(0,7);
+    const chaExp  = expenses.filter(e => e.date && e.date.startsWith(currentMonth) && e.addedBy==='Cha') .reduce((s,e)=>s+e.amount,0);
+    const chadExp = expenses.filter(e => e.date && e.date.startsWith(currentMonth) && e.addedBy==='Chad').reduce((s,e)=>s+e.amount,0);
+    const totalExp = expenses.filter(e => e.date && e.date.startsWith(currentMonth)).reduce((s,e)=>s+e.amount,0);
+    const totalInc = budgetData.income.reduce((s,i)=>s+i.amount,0);
+    const net = totalInc - totalExp;
 
-    // Inject combined card into dashboard if not exists
     let card = document.getElementById('combined-card');
     if (!card) {
       card = document.createElement('div');
       card.id = 'combined-card';
       card.className = 'combined-card';
-      // Insert after net-card
       const netCard = document.querySelector('.net-card');
       if (netCard) netCard.insertAdjacentElement('afterend', card);
+      else document.querySelector('.content').prepend(card);
     }
 
     card.innerHTML =
-      '<div class="combined-title">👫 Combined Expenses This Month</div>' +
+      '<div class="combined-title">👫 Cha & Chad — This Month</div>' +
       '<div class="combined-row">' +
         '<div class="combined-person">' +
           '<div class="cp-name" style="color:var(--accent)">👩 Cha</div>' +
-          '<div class="cp-amount" style="color:var(--accent4)">₱' + chaExp.toLocaleString() + '</div>' +
+          '<div class="cp-amount negative">₱' + chaExp.toLocaleString() + '</div>' +
         '</div>' +
         '<div class="combined-person">' +
           '<div class="cp-name" style="color:var(--accent2)">👨 Chad</div>' +
-          '<div class="cp-amount" style="color:var(--accent4)">₱' + hubExp.toLocaleString() + '</div>' +
+          '<div class="cp-amount negative">₱' + chadExp.toLocaleString() + '</div>' +
         '</div>' +
       '</div>' +
-      '<div class="combined-total">' +
-        '<span class="ct-label">Total Combined</span>' +
-        '<span class="ct-val" style="color:var(--accent4)">₱' + total.toLocaleString() + '</span>' +
+      '<div class="combined-total" style="margin-bottom:8px">' +
+        '<span class="ct-label">💸 Total Spent</span>' +
+        '<span class="ct-val negative">₱' + totalExp.toLocaleString() + '</span>' +
+      '</div>' +
+      '<div class="combined-total" style="margin-bottom:8px">' +
+        '<span class="ct-label">💰 Total Income</span>' +
+        '<span class="ct-val positive">₱' + totalInc.toLocaleString() + '</span>' +
+      '</div>' +
+      '<div class="combined-total" style="background:' + (net>=0?'rgba(94,207,170,0.1)':'rgba(224,123,138,0.1)') + '">' +
+        '<span class="ct-label">📊 Net Balance</span>' +
+        '<span class="ct-val" style="color:' + (net>=0?'var(--accent)':'var(--accent4)') + '">₱' + Math.abs(net).toLocaleString() + '</span>' +
       '</div>';
   }
 
-  // Override saveExpense to push to cloud + tag user
+  // ── Override saves to push to cloud ───────
   const _origSaveExpense = saveExpense;
   function saveExpense() {
     _origSaveExpense();
-    // Tag last expense with current user
     if (expenses.length > 0) {
       expenses[0].addedBy = expUser;
-      // Push to cloud
       pushToCloud('addExpense', {
-        id: expenses[0].id,
-        date: expenses[0].date,
-        category: expenses[0].cat,
-        description: expenses[0].desc,
-        amount: expenses[0].amount,
-        addedby: expUser,
+        id: expenses[0].id, date: expenses[0].date,
+        category: expenses[0].cat, description: expenses[0].desc,
+        amount: expenses[0].amount, addedby: expUser,
       });
     }
     renderCombinedSummary();
   }
 
-  // Add sync button to header
+  const _origSaveDebt = saveDebt;
+  function saveDebt() {
+    _origSaveDebt();
+    if (debts.length > 0) {
+      const d = debts[debts.length-1];
+      pushToCloud('addDebt', {
+        id:d.id, type:d.type, name:d.name, amount:d.amount,
+        paid:d.paid, duedate:d.due, notes:d.notes,
+        settled:d.settled, addedby:currentUser
+      });
+    }
+  }
+
+  const _origSaveHulog = saveHulog;
+  function saveHulog() {
+    _origSaveHulog();
+    if (hulogs.length > 0) {
+      const h = hulogs[0];
+      pushToCloud('addHulog', {
+        id:h.id, type:h.type, name:h.name, store:h.store,
+        total:h.amount, monthly:h.monthly, paidmonths:h.paidMonths,
+        totalmonths:h.totalMonths, nextdue:h.nextDue,
+        done:h.done, addedby:currentUser
+      });
+    }
+  }
+
+  const _origMarkPaid = markPaid;
+  function markPaid(id) {
+    _origMarkPaid(id);
+    const d = debts.find(x=>x.id===id);
+    if (d) pushToCloud('updateDebt', {
+      id:d.id, type:d.type, name:d.name, amount:d.amount,
+      paid:d.paid, duedate:d.due, notes:d.notes, settled:true
+    });
+  }
+
+  const _origPayHulog = payHulog;
+  function payHulog(id) {
+    _origPayHulog(id);
+    const h = hulogs.find(x=>x.id===id);
+    if (h) pushToCloud('updateHulog', {
+      id:h.id, type:h.type, name:h.name, store:h.store,
+      total:h.amount, monthly:h.monthly, paidmonths:h.paidMonths,
+      totalmonths:h.totalMonths, nextdue:h.nextDue, done:h.done
+    });
+  }
+
+  // ══════════════════════════════════════════
+  //   PDF EXPORT — Monthly Report
+  // ══════════════════════════════════════════
+  function exportPDF() {
+    const month = new Date().toLocaleDateString('en-PH', {month:'long', year:'numeric'});
+    const currentMonthStr = new Date().toISOString().slice(0,7);
+
+    // Computed data
+    const totalInc  = budgetData.income.reduce((s,i)=>s+i.amount,0);
+    const totalExp  = expenses.filter(e=>e.date&&e.date.startsWith(currentMonthStr)).reduce((s,e)=>s+e.amount,0);
+    const net       = totalInc - totalExp;
+    const chaExp    = expenses.filter(e=>e.date&&e.date.startsWith(currentMonthStr)&&e.addedBy==='Cha').reduce((s,e)=>s+e.amount,0);
+    const chadExp   = expenses.filter(e=>e.date&&e.date.startsWith(currentMonthStr)&&e.addedBy==='Chad').reduce((s,e)=>s+e.amount,0);
+    const activeDebts = debts.filter(d=>!d.settled);
+    const oweMeTotal  = activeDebts.filter(d=>d.type==='oweme').reduce((s,d)=>s+(d.amount-d.paid),0);
+    const iOweTotal   = activeDebts.filter(d=>d.type==='iowe').reduce((s,d)=>s+(d.amount-d.paid),0);
+    const activeHulogs = hulogs.filter(h=>!h.done);
+    const monthlyHulog = activeHulogs.reduce((s,h)=>s+h.monthly,0);
+
+    // Category breakdown
+    const catMap = {food:'🍚 Food',transpo:'🚌 Transpo',bills:'⚡ Bills',shopping:'🛍️ Shopping',health:'💊 Health',leisure:'🎮 Leisure',savings:'🐷 Savings',others:'📦 Others'};
+    const catTotals = {};
+    expenses.filter(e=>e.date&&e.date.startsWith(currentMonthStr)).forEach(e=>{
+      catTotals[e.cat] = (catTotals[e.cat]||0)+e.amount;
+    });
+
+    const fmt = n => '₱' + n.toLocaleString('en-PH');
+
+    const catRows = Object.entries(catTotals)
+      .sort((a,b)=>b[1]-a[1])
+      .map(([cat,amt]) => `
+        <tr>
+          <td>${catMap[cat]||cat}</td>
+          <td style="text-align:right;color:#e07b8a;font-weight:700">${fmt(amt)}</td>
+          <td style="text-align:right;color:#8898aa">${totalExp>0?Math.round(amt/totalExp*100):0}%</td>
+        </tr>`).join('');
+
+    const recentExp = expenses
+      .filter(e=>e.date&&e.date.startsWith(currentMonthStr))
+      .sort((a,b)=>b.date.localeCompare(a.date))
+      .slice(0,10)
+      .map(e=>`
+        <tr>
+          <td>${e.date}</td>
+          <td>${e.desc}</td>
+          <td style="color:#8898aa">${catMap[e.cat]||e.cat}</td>
+          <td style="color:#6ba3d6;font-weight:700">${e.addedBy||'-'}</td>
+          <td style="text-align:right;color:#e07b8a;font-weight:700">${fmt(e.amount)}</td>
+        </tr>`).join('');
+
+    const debtRows = activeDebts.map(d=>`
+      <tr>
+        <td>${d.name}</td>
+        <td style="color:${d.type==='oweme'?'#5ecfaa':'#e07b8a'}">${d.type==='oweme'?'Owes Me':'I Owe'}</td>
+        <td style="text-align:right">${fmt(d.amount)}</td>
+        <td style="text-align:right;color:#5ecfaa">${fmt(d.paid)}</td>
+        <td style="text-align:right;color:#e07b8a;font-weight:700">${fmt(d.amount-d.paid)}</td>
+      </tr>`).join('');
+
+    const hulogRows = activeHulogs.map(h=>`
+      <tr>
+        <td>${h.name}</td>
+        <td style="color:#8898aa">${h.store}</td>
+        <td style="text-align:right;color:#e8b86d;font-weight:700">${fmt(h.monthly)}/mo</td>
+        <td style="text-align:right">${h.paidMonths}/${h.totalMonths}</td>
+        <td style="text-align:right;color:#5ecfaa">${Math.round(h.paidMonths/h.totalMonths*100)}%</td>
+      </tr>`).join('');
+
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>BudgetBuddy Report — ${month}</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: Arial, sans-serif; color: #1a2233; background: #fff; padding: 32px; font-size: 13px; }
+  .header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:28px; padding-bottom:16px; border-bottom:3px solid #0e1420; }
+  .app-name { font-size:28px; font-weight:900; color:#0e1420; }
+  .app-name span { color:#2ebd8f; }
+  .report-meta { text-align:right; color:#5a6a82; font-size:12px; }
+  .report-month { font-size:16px; font-weight:700; color:#0e1420; margin-bottom:4px; }
+  .section { margin-bottom:24px; }
+  .section-title { font-size:14px; font-weight:900; color:#0e1420; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; padding:6px 10px; background:#f5f7fa; border-left:4px solid #2ebd8f; border-radius:0 6px 6px 0; }
+  .summary-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:20px; }
+  .sum-card { background:#f5f7fa; border-radius:10px; padding:14px; text-align:center; }
+  .sum-val { font-size:20px; font-weight:900; margin-bottom:4px; }
+  .sum-label { font-size:10px; color:#5a6a82; text-transform:uppercase; letter-spacing:0.5px; }
+  .person-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+  .person-card { border-radius:10px; padding:14px; text-align:center; }
+  .cha-card  { background:#f0fdf8; border:1px solid #2ebd8f44; }
+  .chad-card { background:#eff6ff; border:1px solid #4a90d944; }
+  table { width:100%; border-collapse:collapse; }
+  th { background:#f5f7fa; padding:8px 10px; text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#5a6a82; border-bottom:2px solid #e8edf5; }
+  td { padding:8px 10px; border-bottom:1px solid #f0f0f0; font-size:12px; }
+  tr:last-child td { border-bottom:none; }
+  .positive { color:#2ebd8f; } .negative { color:#d95f6e; }
+  .footer { margin-top:32px; padding-top:16px; border-top:2px solid #f0f0f0; text-align:center; color:#8898aa; font-size:11px; }
+  @media print {
+    body { padding:16px; }
+    .no-print { display:none; }
+  }
+
+  /* ══ NOTIFICATIONS & DUE ALERTS ══ */
+  .due-overlay {
+    position: fixed; inset: 0; z-index: 550;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+    display: none; align-items: flex-end; justify-content: center;
+  }
+  .due-overlay.show { display: flex; }
+  .due-sheet {
+    width: 100%; max-width: 420px;
+    background: var(--surface);
+    border-radius: 28px 28px 0 0;
+    border-top: 1px solid var(--border);
+    padding: 20px 20px 44px;
+    max-height: 85vh; overflow-y: auto;
+    animation: slideUp 0.35s cubic-bezier(0.34,1.2,0.64,1);
+  }
+  .due-sheet-handle {
+    width: 36px; height: 4px; background: var(--border);
+    border-radius: 2px; margin: 0 auto 16px;
+  }
+  .due-sheet-title {
+    font-size: 18px; font-weight: 900; color: var(--text);
+    margin-bottom: 4px;
+  }
+  .due-sheet-sub {
+    font-size: 12px; color: var(--muted2); margin-bottom: 18px;
+  }
+
+  .due-alert-item {
+    background: var(--surface2); border-radius: 16px;
+    padding: 14px; margin-bottom: 8px;
+    border-left: 4px solid var(--accent3);
+    display: flex; gap: 12px; align-items: center;
+  }
+  .due-alert-item.overdue  { border-left-color: var(--accent4); }
+  .due-alert-item.critical { border-left-color: var(--accent4);
+    background: rgba(224,123,138,0.08); }
+  .due-alert-item.upcoming { border-left-color: var(--accent3); }
+  .due-alert-item.soon     { border-left-color: var(--accent2); }
+
+  .dai-icon {
+    width: 40px; height: 40px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .dai-info { flex: 1; min-width: 0; }
+  .dai-name { font-size: 13px; font-weight: 900; color: var(--text); margin-bottom: 2px; }
+  .dai-meta { font-size: 11px; color: var(--muted2); }
+  .dai-right { text-align: right; flex-shrink: 0; }
+  .dai-amount { font-size: 14px; font-weight: 900; margin-bottom: 2px; }
+  .dai-days { font-size: 10px; font-weight: 900; text-transform: uppercase;
+    letter-spacing: 0.5px; padding: 2px 8px; border-radius: 20px; }
+  .days-overdue  { background: rgba(224,123,138,0.2); color: var(--accent4); }
+  .days-today    { background: rgba(224,123,138,0.2); color: var(--accent4); }
+  .days-soon     { background: rgba(232,184,109,0.2); color: var(--accent3); }
+  .days-upcoming { background: rgba(107,163,214,0.2); color: var(--accent2); }
+
+  /* Notification bell badge */
+  .notif-badge {
+    position: absolute; top: -4px; right: -4px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--accent4); color: #fff;
+    font-size: 9px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  .notif-btn-wrap { position: relative; display: inline-flex; }
+
+  /* Due soon banner on dashboard */
+  .due-banner {
+    background: linear-gradient(135deg, rgba(232,184,109,0.15), rgba(224,123,138,0.1));
+    border: 1px solid var(--accent3);
+    border-radius: 18px; padding: 14px 16px;
+    margin-bottom: 14px; cursor: pointer;
+    transition: all 0.2s; display: none;
+  }
+  .due-banner.show { display: block; }
+  .due-banner:active { transform: scale(0.98); }
+  .due-banner-title { font-size: 13px; font-weight: 900; color: var(--text);
+    margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .due-banner-items { display: flex; flex-direction: column; gap: 4px; }
+  .dbi { font-size: 11px; color: var(--muted2); display: flex;
+    justify-content: space-between; }
+  .dbi-name { font-weight: 700; color: var(--text); }
+
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="app-name">Budget<span>Buddy</span></div>
+    <div style="color:#5a6a82;font-size:12px;margin-top:4px">Personal Finance Tracker</div>
+  </div>
+  <div class="report-meta">
+    <div class="report-month">📊 ${month} Report</div>
+    <div>Generated: ${new Date().toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+    <div style="margin-top:4px">👩 Cha &amp; 👨 Chad</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">💰 Financial Summary</div>
+  <div class="summary-grid">
+    <div class="sum-card">
+      <div class="sum-val positive">${fmt(totalInc)}</div>
+      <div class="sum-label">Total Income</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-val negative">${fmt(totalExp)}</div>
+      <div class="sum-label">Total Expenses</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-val" style="color:${net>=0?'#2ebd8f':'#d95f6e'}">${fmt(Math.abs(net))}</div>
+      <div class="sum-label">${net>=0?'Net Savings':'Over Budget'}</div>
+    </div>
+  </div>
+
+  <div class="person-grid">
+    <div class="person-card cha-card">
+      <div style="font-size:22px;margin-bottom:6px">👩</div>
+      <div style="font-size:18px;font-weight:900;color:#d95f6e">${fmt(chaExp)}</div>
+      <div style="font-size:11px;color:#5a6a82;margin-top:2px">Cha's Expenses</div>
+    </div>
+    <div class="person-card chad-card">
+      <div style="font-size:22px;margin-bottom:6px">👨</div>
+      <div style="font-size:18px;font-weight:900;color:#d95f6e">${fmt(chadExp)}</div>
+      <div style="font-size:11px;color:#5a6a82;margin-top:2px">Chad's Expenses</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">📊 Expenses by Category</div>
+  <table>
+    <tr><th>Category</th><th style="text-align:right">Amount</th><th style="text-align:right">% of Total</th></tr>
+    ${catRows || '<tr><td colspan="3" style="color:#8898aa;text-align:center">No expenses this month</td></tr>'}
+  </table>
+</div>
+
+<div class="section">
+  <div class="section-title">🧾 Recent Transactions (Top 10)</div>
+  <table>
+    <tr><th>Date</th><th>Description</th><th>Category</th><th>By</th><th style="text-align:right">Amount</th></tr>
+    ${recentExp || '<tr><td colspan="5" style="color:#8898aa;text-align:center">No transactions</td></tr>'}
+  </table>
+</div>
+
+<div class="section">
+  <div class="section-title">💸 Active Debts</div>
+  <table>
+    <tr><th>Name</th><th>Type</th><th style="text-align:right">Total</th><th style="text-align:right">Paid</th><th style="text-align:right">Balance</th></tr>
+    ${debtRows || '<tr><td colspan="5" style="color:#8898aa;text-align:center">No active debts 🎉</td></tr>'}
+  </table>
+  <div style="display:flex;gap:20px;margin-top:10px;padding:10px;background:#f5f7fa;border-radius:8px">
+    <div><span style="color:#5a6a82;font-size:11px">Others owe us: </span><strong style="color:#2ebd8f">${fmt(oweMeTotal)}</strong></div>
+    <div><span style="color:#5a6a82;font-size:11px">We owe others: </span><strong style="color:#d95f6e">${fmt(iOweTotal)}</strong></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">📦 Active Installments</div>
+  <table>
+    <tr><th>Item</th><th>Store</th><th style="text-align:right">Monthly</th><th style="text-align:right">Progress</th><th style="text-align:right">Done</th></tr>
+    ${hulogRows || '<tr><td colspan="5" style="color:#8898aa;text-align:center">No active installments 🎉</td></tr>'}
+  </table>
+  ${activeHulogs.length>0?`<div style="margin-top:10px;padding:10px;background:#f5f7fa;border-radius:8px"><span style="color:#5a6a82;font-size:11px">Total monthly commitment: </span><strong style="color:#e8b86d">${fmt(monthlyHulog)}/month</strong></div>`:''}
+</div>
+
+<div class="footer">
+  <strong>BudgetBuddy</strong> — Personal Finance Tracker for Cha &amp; Chad 💚<br>
+  This report was auto-generated on ${new Date().toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'})}
+</div>
+
+<div class="no-print" style="text-align:center;margin-top:24px">
+  <button onclick="window.print()" style="padding:12px 28px;background:#2ebd8f;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:900;cursor:pointer;">
+    🖨️ Print / Save as PDF
+  </button>
+  <button onclick="window.close()" style="padding:12px 28px;background:#f5f7fa;color:#1a2233;border:1px solid #e8edf5;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;margin-left:10px;">
+    ✕ Close
+  </button>
+</div>
+
+</body>
+</html>`;
+
+    // Open in new tab
+    const blob = new Blob([html], { type: 'text/html' });
+    const url  = URL.createObjectURL(blob);
+    const win  = window.open(url, '_blank');
+    if (!win) {
+      // Fallback: download as HTML file
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'BudgetBuddy_Report_' + currentMonthStr + '.html';
+      a.click();
+      showToast('📄 Report downloaded!');
+    } else {
+      showToast('📊 Report opened — tap Print to save as PDF!');
+    }
+  }
+
+  // ── Add PDF button + sync button to header ─────────
   document.addEventListener('DOMContentLoaded', () => {
     const headerActions = document.querySelector('.header-actions');
-    if (headerActions && scriptUrl) {
-      const syncBtn = document.createElement('div');
-      syncBtn.className = 'icon-btn';
-      syncBtn.innerHTML = '🔄';
-      syncBtn.onclick = syncFromCloud;
-      headerActions.insertBefore(syncBtn, headerActions.firstChild);
+    if (headerActions) {
+      // PDF button
+      const pdfBtn = document.createElement('div');
+      pdfBtn.className = 'icon-btn';
+      pdfBtn.innerHTML = '📄';
+      pdfBtn.title = 'Export PDF Report';
+      pdfBtn.onclick = exportPDF;
+      headerActions.insertBefore(pdfBtn, headerActions.firstChild);
+
+      // Sync button (only if scriptUrl configured)
+      if (scriptUrl) {
+        const syncBtn = document.createElement('div');
+        syncBtn.className = 'icon-btn';
+        syncBtn.innerHTML = '🔄';
+        syncBtn.title = 'Sync with Google Sheets';
+        syncBtn.onclick = () => syncFromCloud(false);
+        headerActions.insertBefore(syncBtn, headerActions.firstChild);
+      }
     }
-    // Set exp user default
     selectExpUser(currentUser || 'Cha');
   });
 
+
+
+  // ══════════════════════════════════════════
+  //   NOTIFICATIONS & DUE DATE ALERTS
+  // ══════════════════════════════════════════
+
+  // ── Get all upcoming dues ─────────────────
+  function getUpcomingDues(daysAhead = 7) {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const ahead = new Date(today);
+    ahead.setDate(today.getDate() + daysAhead);
+
+    const items = [];
+
+    // Debts
+    debts.filter(d => !d.settled).forEach(d => {
+      if (!d.due) return;
+      const due = new Date(d.due);
+      const diff = Math.ceil((due - today) / 86400000);
+      if (diff <= daysAhead) {
+        items.push({
+          type:   'debt',
+          icon:   d.type === 'oweme' ? '🤝' : '😬',
+          name:   d.name,
+          meta:   d.type === 'oweme' ? 'Someone owes you' : 'You owe someone',
+          amount: d.amount - d.paid,
+          diff,
+          color:  d.type === 'oweme' ? 'var(--accent)' : 'var(--accent4)',
+        });
+      }
+    });
+
+    // Hulogs
+    hulogs.filter(h => !h.done).forEach(h => {
+      if (!h.nextDue) return;
+      const due = new Date(h.nextDue);
+      const diff = Math.ceil((due - today) / 86400000);
+      if (diff <= daysAhead) {
+        items.push({
+          type:   'hulog',
+          icon:   '📦',
+          name:   h.name,
+          meta:   h.store + ' · Month ' + (h.paidMonths+1) + '/' + h.totalMonths,
+          amount: h.monthly,
+          diff,
+          color:  'var(--accent3)',
+        });
+      }
+    });
+
+    // Sort: overdue first, then by days
+    items.sort((a,b) => a.diff - b.diff);
+    return items;
+  }
+
+  // ── Render due alerts sheet ───────────────
+  function renderDueSheet() {
+    const items = getUpcomingDues(14); // 14 days ahead
+    const list  = document.getElementById('due-alerts-list');
+    const sub   = document.getElementById('due-sheet-sub');
+
+    if (items.length === 0) {
+      sub.textContent = 'You're all clear for the next 2 weeks! 🎉';
+      list.innerHTML  = '<div style="text-align:center;padding:32px 0;font-size:40px">🎉</div>';
+      return;
+    }
+
+    const overdue  = items.filter(i => i.diff < 0).length;
+    const today_ct = items.filter(i => i.diff === 0).length;
+    const upcoming = items.filter(i => i.diff > 0).length;
+
+    sub.textContent = [
+      overdue  ? overdue  + ' overdue'   : '',
+      today_ct ? today_ct + ' due today' : '',
+      upcoming ? upcoming + ' upcoming'  : '',
+    ].filter(Boolean).join(' · ') + ' in the next 2 weeks';
+
+    list.innerHTML = items.map(item => {
+      let daysLabel, daysClass, itemClass;
+      if (item.diff < 0) {
+        daysLabel = 'Overdue ' + Math.abs(item.diff) + 'd';
+        daysClass = 'days-overdue'; itemClass = 'overdue critical';
+      } else if (item.diff === 0) {
+        daysLabel = 'Due Today!';
+        daysClass = 'days-today'; itemClass = 'overdue critical';
+      } else if (item.diff <= 3) {
+        daysLabel = 'In ' + item.diff + 'd';
+        daysClass = 'days-soon'; itemClass = 'upcoming';
+      } else {
+        daysLabel = 'In ' + item.diff + 'd';
+        daysClass = 'days-upcoming'; itemClass = 'soon';
+      }
+
+      return '<div class="due-alert-item ' + itemClass + '">' +
+        '<div class="dai-icon" style="background:' + item.color + '22">' + item.icon + '</div>' +
+        '<div class="dai-info">' +
+          '<div class="dai-name">' + item.name + '</div>' +
+          '<div class="dai-meta">' + item.meta + '</div>' +
+        '</div>' +
+        '<div class="dai-right">' +
+          '<div class="dai-amount" style="color:' + item.color + '">₱' + item.amount.toLocaleString() + '</div>' +
+          '<div class="dai-days ' + daysClass + '">' + daysLabel + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function openDueSheet() {
+    renderDueSheet();
+    document.getElementById('dueOverlay').classList.add('show');
+  }
+
+  function closeDueSheet(e) {
+    if (!e || e.target === document.getElementById('dueOverlay')) {
+      document.getElementById('dueOverlay').classList.remove('show');
+    }
+  }
+
+  // ── Dashboard due banner ──────────────────
+  function renderDueBanner() {
+    const items = getUpcomingDues(7);
+    const banner = document.getElementById('due-banner');
+    const titleEl = document.getElementById('due-banner-title');
+    const itemsEl = document.getElementById('due-banner-items');
+    if (!banner) return;
+
+    if (items.length === 0) { banner.classList.remove('show'); return; }
+    banner.classList.add('show');
+
+    const overdue = items.filter(i => i.diff < 0).length;
+    titleEl.textContent = overdue > 0
+      ? '⚠️ ' + overdue + ' overdue · ' + items.length + ' total this week'
+      : '🔔 ' + items.length + ' due within 7 days';
+
+    itemsEl.innerHTML = items.slice(0,3).map(item => {
+      const label = item.diff < 0 ? 'Overdue ' + Math.abs(item.diff) + 'd'
+                  : item.diff === 0 ? 'Today!'
+                  : 'In ' + item.diff + 'd';
+      return '<div class="dbi">' +
+        '<span class="dbi-name">' + item.icon + ' ' + item.name + '</span>' +
+        '<span style="color:' + (item.diff <= 0 ? 'var(--accent4)' : 'var(--accent3)') + ';font-weight:900">₱' +
+        item.amount.toLocaleString() + ' · ' + label + '</span>' +
+      '</div>';
+    }).join('');
+
+    if (items.length > 3) {
+      itemsEl.innerHTML += '<div class="dbi" style="color:var(--muted);margin-top:4px">+ ' + (items.length-3) + ' more — tap to view all</div>';
+    }
+
+    // Update bell badge
+    const badge = document.getElementById('notif-badge');
+    if (badge) {
+      badge.textContent = items.length;
+      badge.style.display = items.length > 0 ? 'flex' : 'none';
+    }
+  }
+
+  // ── Override bell button to open due sheet ─
+  function showNotifs() { openDueSheet(); }
+
+  // ── Check dues on load + every 5 mins ─────
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      renderDueBanner();
+      addNotifBadge();
+      // Auto show if overdue items exist
+      const overdueItems = getUpcomingDues(0); // today or overdue only
+      if (overdueItems.length > 0) {
+        setTimeout(openDueSheet, 1500);
+      }
+    }, 600);
+    setInterval(renderDueBanner, 300000); // refresh every 5 min
+  });
+
+  function addNotifBadge() {
+    const bellBtn = document.querySelector('.icon-btn');
+    if (bellBtn && bellBtn.textContent === '🔔') {
+      bellBtn.style.position = 'relative';
+      const badge = document.createElement('div');
+      badge.id = 'notif-badge';
+      badge.className = 'notif-badge';
+      badge.style.display = 'none';
+      bellBtn.appendChild(badge);
+      bellBtn.style.overflow = 'visible';
+    }
+  }
+
 </script>
-
-
-  <!-- PWA Install Banner (Android) -->
-  <div class="pwa-banner hidden" id="pwaBanner">
-    <div class="pwa-banner-icon">₱</div>
-    <div class="pwa-banner-text">
-      <div class="pwa-banner-title">Add BudgetBuddy to Home Screen</div>
-      <div class="pwa-banner-sub">Access instantly, works offline!</div>
-    </div>
-    <button class="pwa-install-btn" id="pwaInstallBtn">Install</button>
-    <button class="pwa-close-btn" onclick="dismissBanner()">✕</button>
-  </div>
-
-  <!-- iOS Install Tip -->
-  <div class="ios-tip" id="iosTip">
-    <div class="ios-tip-title">📲 Add to Home Screen</div>
-    <div class="ios-tip-steps">
-      1. Tap the <span>Share button</span> (□↑) at the bottom<br>
-      2. Scroll down and tap <span>"Add to Home Screen"</span><br>
-      3. Tap <span>"Add"</span> — done! BudgetBuddy icon will appear 🎉
-    </div>
-    <button class="ios-tip-close" onclick="dismissIosTip()">Got it!</button>
-  </div>
-
-</body>
-</html>
