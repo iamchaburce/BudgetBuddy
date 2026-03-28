@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>FormulaKo BudgetBuddy — Cha & Chad</title>
+<title>BudgetBuddy — Cha & Chad</title>
 <meta name="theme-color" content="#0e1420" id="pwa-theme-color">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1625,8 +1625,8 @@ const thisMonth = () => new Date().toISOString().slice(0,7);
 // ══════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
   // Set date
+  // Load user names FIRST before any rendering
   // Personal version — Cha & Chad pre-configured
-  // Still respect localStorage in case they want to change
   const _s1 = localStorage.getItem('fk-user1') || 'Cha';
   const _s2 = localStorage.getItem('fk-user2') || 'Chad';
   const _sc = localStorage.getItem('fk-user')  || 'Cha';
@@ -1634,7 +1634,6 @@ document.addEventListener('DOMContentLoaded', () => {
   user1Name   = _ok(_s1) ? _s1 : 'Cha';
   user2Name   = _ok(_s2) ? _s2 : 'Chad';
   currentUser = _ok(_sc) ? _sc : 'Cha';
-  // Save defaults if not set
   if (!localStorage.getItem('fk-user1')) localStorage.setItem('fk-user1', 'Cha');
   if (!localStorage.getItem('fk-user2')) localStorage.setItem('fk-user2', 'Chad');
   if (!localStorage.getItem('fk-user'))  localStorage.setItem('fk-user',  'Cha');
@@ -1645,14 +1644,23 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load ALL data first
   loadLocal();
   scriptUrl = localStorage.getItem('fk-script-url') || '';
+  // Load saved loans
+  try {
+    const ls = localStorage.getItem('fk-loans');
+    if (ls) {
+      const parsed = JSON.parse(ls);
+      if (parsed && parsed.length > 0) {
+        savedLoans = parsed;
+        _loanId = Math.max(...savedLoans.map(l => l.id), 0) + 1;
+      }
+    }
+  } catch(e) {}
 
   // Names already loaded above from localStorage — now render with correct names
   renderGreeting();
 
-  // Personal version — onboarding only if names are cleared
-  if (!currentUser) {
-    setTimeout(() => document.getElementById('setup-modal').classList.add('open'), 600);
-  }
+  // Personal version — onboarding only if manually triggered
+  // (names always pre-set to Cha & Chad)
   // Onboarding handled above
 
   // Build dynamic grids
@@ -3379,10 +3387,17 @@ function loadSavedLoan(id) {
 }
 
 function renderSavedLoans() {
-  // Load from storage if array is empty
-  if (!savedLoans.length) {
-    try { const s = localStorage.getItem('fk-loans'); if (s) { savedLoans = JSON.parse(s); _loanId = Math.max(...savedLoans.map(l=>l.id), 0) + 1; } } catch(e) {}
-  }
+  // Always reload from localStorage
+  try {
+    const s = localStorage.getItem('fk-loans');
+    if (s) {
+      const parsed = JSON.parse(s);
+      if (parsed && parsed.length > 0) {
+        savedLoans = parsed;
+        _loanId = Math.max(...savedLoans.map(l=>l.id), 0) + 1;
+      }
+    }
+  } catch(e) {}
   const section  = document.getElementById('saved-loans-section');
   const list     = document.getElementById('saved-loans-list');
   const countEl  = document.getElementById('saved-loans-count');
@@ -3616,16 +3631,17 @@ function filterByUser(userNum) {
 // ══════════════════════════════════════════════
 
 function renderLoanTracker() {
-  // Load from storage if needed
-  if (!savedLoans.length) {
-    try {
-      const s = localStorage.getItem('fk-loans');
-      if (s) {
-        savedLoans = JSON.parse(s);
+  // Always reload from localStorage to get latest data
+  try {
+    const s = localStorage.getItem('fk-loans');
+    if (s) {
+      const parsed = JSON.parse(s);
+      if (parsed && parsed.length > 0) {
+        savedLoans = parsed;
         _loanId = Math.max(...savedLoans.map(l => l.id), 0) + 1;
       }
-    } catch(e) {}
-  }
+    }
+  } catch(e) {}
 
   const section = document.getElementById('loan-payment-tracker');
   const list    = document.getElementById('loan-tracker-list');
