@@ -786,9 +786,12 @@ h1, h2, h3, .section-title-syne { font-family: 'Syne', sans-serif !important; }
 
       <!-- ── LOAN PAYMENT TRACKER ── -->
       <div id="loan-payment-tracker" style="display:none;margin-top:8px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:6px;flex-wrap:wrap">
           <div class="sec-title" style="margin:0">🏦 Loan Payment Tracker</div>
-          <button onclick="openScreen('loans')" style="font-size:11px;padding:5px 12px;background:var(--acc);color:var(--bg);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:700;cursor:pointer">+ New Loan</button>
+          <div style="display:flex;gap:6px">
+            <button onclick="fixDuplicatePayments()" style="font-size:11px;padding:5px 12px;background:rgba(224,123,138,.15);color:var(--acc4);border:1px solid rgba(224,123,138,.3);border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:700;cursor:pointer" title="Remove duplicate payment records">🧹 Fix Duplicates</button>
+            <button onclick="openScreen('loans')" style="font-size:11px;padding:5px 12px;background:var(--acc);color:var(--bg);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:700;cursor:pointer">+ New Loan</button>
+          </div>
         </div>
         <div id="loan-tracker-list"></div>
       </div>
@@ -4108,6 +4111,22 @@ function recordPayment() {
   const now       = new Date();
   const thisMonth = now.toLocaleDateString('en-PH', {month:'short', year:'numeric'});
 
+  // ── DUPLICATE CHECK ──────────────────────────────────────────
+  // Prevent recording the same period twice (non-partial/skip payments)
+  if (_currentPaymentType === 'normal' || _currentPaymentType === 'late') {
+    const alreadyRecorded = (loan.paymentHistory || []).some(
+      h => h.period === paidCount + 1 && (h.type === 'normal' || h.type === 'late')
+    );
+    if (alreadyRecorded) {
+      return toast('⚠️ Period ' + (paidCount + 1) + ' ay naka-record na! I-check ang Payment History.');
+    }
+    if (loan.lastPaidMonth === thisMonth && !carryover) {
+      const confirmDup = confirm('⚠️ May nakitang payment na para sa ' + thisMonth + '. Sigurado kang nag-doblo? I-cancel para huwag mag-duplicate.');
+      if (!confirmDup) return;
+    }
+  }
+  // ────────────────────────────────────────────────────────────
+
   // Initialize history array
   if (!loan.paymentHistory) loan.paymentHistory = [];
 
@@ -4261,6 +4280,48 @@ function saveEditPaymentHistory() {
   document.getElementById('modal-edit-payment').classList.remove('open');
   renderLoanTracker();
   toast('✅ Payment record updated!');
+}
+
+function fixDuplicatePayments() {
+  let totalRemoved = 0;
+
+  savedLoans.forEach(loan => {
+    if (!loan.paymentHistory || !loan.paymentHistory.length) return;
+
+    // Find and remove duplicate periods — keep only the FIRST record per period number
+    const seen = new Set();
+    const original = loan.paymentHistory.length;
+    loan.paymentHistory = loan.paymentHistory.filter(h => {
+      // For normal/late payments, deduplicate by period number
+      if (h.type === 'normal' || h.type === 'late') {
+        const key = 'p' + h.period;
+        if (seen.has(key)) return false; // duplicate — remove
+        seen.add(key);
+      }
+      return true;
+    });
+
+    const removed = original - loan.paymentHistory.length;
+    totalRemoved += removed;
+
+    if (removed > 0) {
+      // Recalculate paidCount from clean history
+      loan.paidCount = loan.paymentHistory.filter(
+        h => h.type === 'normal' || h.type === 'late'
+      ).length;
+      // Recalculate late fees
+      loan.totalLateFees = loan.paymentHistory.reduce((s, h) => s + (h.lateFee || 0), 0);
+    }
+  });
+
+  try { localStorage.setItem('fk-loans', JSON.stringify(savedLoans)); } catch(e) {}
+  renderLoanTracker();
+
+  if (totalRemoved > 0) {
+    toast('🧹 ' + totalRemoved + ' duplicate record' + (totalRemoved > 1 ? 's' : '') + ' na-remove!');
+  } else {
+    toast('✅ Walang duplicates na nahanap.');
+  }
 }
 
 function deletePaymentHistory(loanId, histIdx) {
