@@ -1663,6 +1663,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   } catch(e) {}
 
+  // ── MIGRATE: recalculate paidCount from paymentHistory for all loans ──
+  // Fixes corrupted paidCount caused by old bugs (skips/partials advancing count)
+  let migrated = false;
+  savedLoans.forEach(loan => {
+    if (!loan.paymentHistory) { loan.paymentHistory = []; return; }
+    const correctCount = loan.paymentHistory.filter(h => h.type === 'normal' || h.type === 'late').length;
+    if (loan.paidCount !== correctCount) {
+      loan.paidCount = correctCount;
+      migrated = true;
+    }
+    // Recalculate carryover
+    let carryover = 0;
+    loan.paymentHistory.forEach(ph => {
+      if (ph.type === 'skip' || ph.type === 'partial') carryover = ph.carryoverAdded || 0;
+      else if (ph.type === 'normal' || ph.type === 'late') carryover = 0;
+    });
+    if (loan.carryoverBalance !== carryover) {
+      loan.carryoverBalance = carryover;
+      migrated = true;
+    }
+  });
+  if (migrated) {
+    try { localStorage.setItem('fk-loans', JSON.stringify(savedLoans)); } catch(e) {}
+  }
+
   // Names already loaded above from localStorage — now render with correct names
   renderGreeting();
 
@@ -3761,15 +3786,20 @@ function renderLoanTracker() {
 
   list.innerHTML = savedLoans.map(loan => {
     const schedule    = loan.schedule || [];
-    const paidCount   = loan.paidCount || 0;
+    const paidCount    = loan.paidCount || 0;
     const totalPeriods = schedule.length;
+    // processedCount = how far into the schedule we are (including skips/partials)
+    // Use paymentHistory length to determine next period, not paidCount
+    const processedCount = (loan.paymentHistory || []).length;
     const pct         = totalPeriods > 0 ? Math.round(paidCount / totalPeriods * 100) : 0;
     const remaining   = totalPeriods - paidCount;
-    const isDone      = paidCount >= totalPeriods && totalPeriods > 0;
+    // isDone only when ALL periods have a normal or late payment (no skips/partials remaining)
+    const fullyPaidCount = (loan.paymentHistory || []).filter(h => h.type === 'normal' || h.type === 'late').length;
+    const isDone      = totalPeriods > 0 && fullyPaidCount >= totalPeriods;
 
-    // Next payment info from schedule
-    const nextPayment  = schedule[paidCount] || null;
-    const lastPayment  = paidCount > 0 ? schedule[paidCount - 1] : null;
+    // Next payment info from schedule — use processedCount so skips/partials are included
+    const nextPayment  = schedule[processedCount] || null;
+    const lastPayment  = processedCount > 0 ? schedule[processedCount - 1] : null;
 
     // Check if paid this month
     const thisMonth   = now.toLocaleDateString('en-PH', {month:'short', year:'numeric'});
@@ -3938,10 +3968,22 @@ function markLoanPaid(id) {
 
 function undoLoanPaid(id) {
   const loan = savedLoans.find(l => l.id === id);
-  if (!loan || !loan.paidCount) return toast('⚠️ No payment to undo');
-  loan.paidCount--;
+  if (!loan || !loan.paymentHistory || !loan.paymentHistory.length) return toast('⚠️ Walang payment na maa-undo');
+  const removed = loan.paymentHistory.pop();
+  // Recalculate paidCount from remaining history
+  loan.paidCount = (loan.paymentHistory).filter(h => h.type === 'normal' || h.type === 'late').length;
+  // Recalculate carryover from last skip/partial if any
+  const lastCarry = [...loan.paymentHistory].reverse().find(h => h.type === 'skip' || h.type === 'partial');
+  const lastPaid  = [...loan.paymentHistory].reverse().find(h => h.type === 'normal' || h.type === 'late');
+  if (lastPaid && (!lastCarry || loan.paymentHistory.indexOf(lastPaid) > loan.paymentHistory.indexOf(lastCarry))) {
+    loan.carryoverBalance = 0;
+  } else {
+    loan.carryoverBalance = lastCarry ? (lastCarry.carryoverAdded || 0) : 0;
+  }
+  // Recalculate late fees
+  loan.totalLateFees = loan.paymentHistory.reduce((s, h) => s + (h.lateFee || 0), 0);
   loan.lastPaidMonth = loan.paidCount > 0 ? loan.lastPaidMonth : null;
-  toast('↩ Payment undone — back to ' + loan.paidCount + ' payments');
+  toast('↩ Nai-undo: ' + (removed.label || 'last payment') + ' — back to ' + loan.paidCount + ' paid');
   try { localStorage.setItem('fk-loans', JSON.stringify(savedLoans)); } catch(e) {}
   renderLoanTracker();
 }
@@ -3978,7 +4020,12 @@ function openPaymentModal(loanId) {
 
   const paidCount    = loan.paidCount || 0;
   const schedule     = loan.schedule  || [];
-  const nextSchedule = schedule[paidCount];
+  // Use history length as processedCount to find correct next period
+  const processedCount = (loan.paymentHistory || []).length;
+  if (processedCount >= schedule.length && schedule.length > 0) {
+    return toast('⚠️ Lahat ng periods ay naka-record na. Gamitin ang ↩ undo para mag-correct.');
+  }
+  const nextSchedule = schedule[processedCount];
   const carryover    = loan.carryoverBalance || 0;
   const carryInt     = Math.round(carryover * 0.05);
   const regularAmt   = nextSchedule ? nextSchedule.payment : parseFloat(loan.payment?.replace(/[₱,]/g,'')) || 0;
@@ -3986,7 +4033,7 @@ function openPaymentModal(loanId) {
 
   // Set modal title
   document.getElementById('pmr-title').textContent =
-    'Record Payment — ' + (nextSchedule?.label || 'Period ' + (paidCount+1));
+    'Record Payment — ' + (nextSchedule?.label || 'Period ' + (processedCount+1));
   document.getElementById('pmr-loan-id').value = loanId;
   document.getElementById('pmr-date').value    = new Date().toISOString().split('T')[0];
   document.getElementById('pmr-notes').value   = '';
@@ -4099,26 +4146,28 @@ function recordPayment() {
   const loan = savedLoans.find(l => l.id === _currentLoanId);
   if (!loan) return;
 
-  const paidCount = loan.paidCount  || 0;
-  const schedule  = loan.schedule   || [];
-  const next      = schedule[paidCount];
-  const carryover = loan.carryoverBalance || 0;
-  const carryInt  = Math.round(carryover * 0.05);
-  const regular   = next ? next.payment : parseFloat(loan.payment?.replace(/[₱,]/g,'')) || 0;
-  const totalDue  = regular + carryover + carryInt;
-  const date      = document.getElementById('pmr-date').value;
-  const notes     = document.getElementById('pmr-notes').value.trim();
-  const now       = new Date();
-  const thisMonth = now.toLocaleDateString('en-PH', {month:'short', year:'numeric'});
+  const schedule       = loan.schedule || [];
+  // processedCount = history length = index of next unrecorded period
+  const processedCount = (loan.paymentHistory || []).length;
+  const paidCount      = (loan.paymentHistory || []).filter(h => h.type === 'normal' || h.type === 'late').length;
+  const next           = schedule[processedCount];
+  const carryover      = loan.carryoverBalance || 0;
+  const carryInt       = Math.round(carryover * 0.05);
+  const regular        = next ? next.payment : parseFloat(loan.payment?.replace(/[₱,]/g,'')) || 0;
+  const totalDue       = regular + carryover + carryInt;
+  const date           = document.getElementById('pmr-date').value;
+  const notes          = document.getElementById('pmr-notes').value.trim();
+  const now            = new Date();
+  const thisMonth      = now.toLocaleDateString('en-PH', {month:'short', year:'numeric'});
 
   // ── DUPLICATE CHECK ──────────────────────────────────────────
   // Prevent recording the same period twice (non-partial/skip payments)
   if (_currentPaymentType === 'normal' || _currentPaymentType === 'late') {
     const alreadyRecorded = (loan.paymentHistory || []).some(
-      h => h.period === paidCount + 1 && (h.type === 'normal' || h.type === 'late')
+      h => h.period === processedCount + 1 && (h.type === 'normal' || h.type === 'late')
     );
     if (alreadyRecorded) {
-      return toast('⚠️ Period ' + (paidCount + 1) + ' ay naka-record na! I-check ang Payment History.');
+      return toast('⚠️ Period ' + (processedCount + 1) + ' ay naka-record na! I-check ang Payment History.');
     }
     if (loan.lastPaidMonth === thisMonth && !carryover) {
       const confirmDup = confirm('⚠️ May nakitang payment na para sa ' + thisMonth + '. Sigurado kang nag-doblo? I-cancel para huwag mag-duplicate.');
@@ -4131,13 +4180,12 @@ function recordPayment() {
   if (!loan.paymentHistory) loan.paymentHistory = [];
 
   if (_currentPaymentType === 'normal') {
-    // Full payment
-    loan.paidCount       = paidCount + 1;
-    loan.lastPaidMonth   = thisMonth;
+    loan.paidCount        = paidCount + 1;
+    loan.lastPaidMonth    = thisMonth;
     loan.carryoverBalance = 0;
     loan.paymentHistory.push({
-      period: paidCount + 1,
-      label:  next?.label || 'Period ' + (paidCount+1),
+      period: processedCount + 1,
+      label:  next?.label || 'Period ' + (processedCount+1),
       type:   'normal',
       amount: totalDue,
       date, notes,
@@ -4155,13 +4203,13 @@ function recordPayment() {
     else if (_currentPenaltyType === 'pct') lateFee = pctFee;
     else lateFee = Math.min(fixedFee, pctFee);
 
-    loan.paidCount       = paidCount + 1;
-    loan.lastPaidMonth   = thisMonth;
+    loan.paidCount        = paidCount + 1;
+    loan.lastPaidMonth    = thisMonth;
     loan.carryoverBalance = 0;
     loan.totalLateFees    = (loan.totalLateFees || 0) + lateFee;
     loan.paymentHistory.push({
-      period: paidCount + 1,
-      label:  next?.label || 'Period ' + (paidCount+1),
+      period: processedCount + 1,
+      label:  next?.label || 'Period ' + (processedCount+1),
       type:   'late',
       amount: totalDue + lateFee,
       lateFee,
@@ -4173,14 +4221,14 @@ function recordPayment() {
   } else if (_currentPaymentType === 'partial') {
     const partialAmt = parseFloat(document.getElementById('pmr-partial-amt').value) || 0;
     const unpaid     = Math.max(0, totalDue - partialAmt);
-    const newCarry   = Math.round(unpaid * 1.05); // add 5% interest on unpaid
+    const newCarry   = Math.round(unpaid * 1.05);
 
     loan.lastPaidMonth    = thisMonth;
     loan.carryoverBalance = newCarry;
-    // Don't advance paidCount — period not complete
+    // paidCount does NOT advance — period not fully paid
     loan.paymentHistory.push({
-      period:  paidCount + 1,
-      label:   (next?.label || 'Period ' + (paidCount+1)) + ' (Partial)',
+      period:  processedCount + 1,
+      label:   (next?.label || 'Period ' + (processedCount+1)) + ' (Partial)',
       type:    'partial',
       amount:  partialAmt,
       unpaid,
@@ -4196,9 +4244,10 @@ function recordPayment() {
 
     loan.carryoverBalance = newCarry;
     loan.totalSkipped     = (loan.totalSkipped || 0) + 1;
+    // paidCount does NOT advance — period skipped
     loan.paymentHistory.push({
-      period:  paidCount + 1,
-      label:   (next?.label || 'Period ' + (paidCount+1)) + ' (Skipped)',
+      period:  processedCount + 1,
+      label:   (next?.label || 'Period ' + (processedCount+1)) + ' (Skipped)',
       type:    'skip',
       amount:  0,
       unpaid:  regular,
@@ -4211,8 +4260,9 @@ function recordPayment() {
     toast('⏭️ Month skipped — ₱' + newCarry.toLocaleString() + ' carries over (incl. 5% interest)');
   }
 
-  // Save
-  if (loan.paidCount >= schedule.length && schedule.length > 0 && _currentPaymentType !== 'skip') {
+  // Save — only show fully paid if ALL periods have normal/late payment
+  const newFullyPaid = (loan.paymentHistory || []).filter(h => h.type === 'normal' || h.type === 'late').length;
+  if (newFullyPaid >= schedule.length && schedule.length > 0) {
     toast('🎉 ' + loan.label + ' — Fully Paid! Congratulations!');
   }
 
@@ -4329,34 +4379,22 @@ function deletePaymentHistory(loanId, histIdx) {
   const loan = savedLoans.find(l => l.id === loanId);
   if (!loan || !loan.paymentHistory) return;
 
-  const h       = loan.paymentHistory[histIdx];
-  const wasType = h?.type;
-
   // Remove from history
   loan.paymentHistory.splice(histIdx, 1);
 
-  // Adjust paidCount if it was a completed payment
-  if (wasType === 'normal' || wasType === 'late') {
-    loan.paidCount = Math.max(0, (loan.paidCount || 0) - 1);
-  }
+  // Always recalculate paidCount from history (only normal/late count as paid)
+  loan.paidCount = loan.paymentHistory.filter(h => h.type === 'normal' || h.type === 'late').length;
 
   // Recalculate total late fees
-  loan.totalLateFees = (loan.paymentHistory || [])
-    .reduce((sum, x) => sum + (x.lateFee || 0), 0);
+  loan.totalLateFees = loan.paymentHistory.reduce((sum, x) => sum + (x.lateFee || 0), 0);
 
-  // If deleted a skip/partial, reset carryover
-  if (wasType === 'skip' || wasType === 'partial') {
-    // Recalculate carryover from remaining history
-    let carryover = 0;
-    loan.paymentHistory.forEach(ph => {
-      if (ph.type === 'skip' || ph.type === 'partial') {
-        carryover = ph.carryoverAdded || 0;
-      } else if (ph.type === 'normal' || ph.type === 'late') {
-        carryover = 0;
-      }
-    });
-    loan.carryoverBalance = carryover;
-  }
+  // Recalculate carryover from last unresolved skip/partial
+  let carryover = 0;
+  loan.paymentHistory.forEach(ph => {
+    if (ph.type === 'skip' || ph.type === 'partial') carryover = ph.carryoverAdded || 0;
+    else if (ph.type === 'normal' || ph.type === 'late') carryover = 0;
+  });
+  loan.carryoverBalance = carryover;
 
   try { localStorage.setItem('fk-loans', JSON.stringify(savedLoans)); } catch(e) {}
   renderLoanTracker();
