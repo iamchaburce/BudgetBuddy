@@ -2202,12 +2202,59 @@ function saveHulog() {
   if (!monthly) return toast('⚠️ Enter monthly payment');
   if (!due)     return toast('⚠️ Pick a due date');
   const totalMonths = Math.round(total/monthly);
-  hulogs.unshift({id:_hulogId++,type:hulogType,name,store:store||'—',total,monthly,paidMonths:paid,totalMonths,nextDue:due,done:paid>=totalMonths});
+  const hulogId = _hulogId++;
+  hulogs.unshift({id:hulogId,type:hulogType,name,store:store||'—',total,monthly,paidMonths:paid,totalMonths,nextDue:due,done:paid>=totalMonths});
+
+  // ── ALSO add to Loan Payment Tracker so "Record Payment" works ──
+  // Build a monthly payment schedule starting from the due date
+  const schedule = [];
+  const dueDate  = new Date(due);
+  for (let i = 0; i < totalMonths; i++) {
+    const d = new Date(dueDate);
+    d.setMonth(d.getMonth() + i);
+    const lbl = d.toLocaleDateString('en-PH', {month:'short', year:'numeric'});
+    schedule.push({
+      label: 'Month ' + (i + 1) + ' — ' + lbl,
+      payment: monthly,
+      principal: monthly,
+      interest: 0,
+      balance: Math.max(0, total - monthly * (i + 1))
+    });
+  }
+  // Compute end date
+  const endD = new Date(dueDate);
+  endD.setMonth(endD.getMonth() + totalMonths - 1);
+  const endDate = endD.toLocaleDateString('en-PH', {month:'short', year:'numeric'});
+
+  const loanLabel = name + (store && store !== '—' ? ' — ' + store : '');
+  savedLoans.unshift({
+    id: _loanId++,
+    label: loanLabel,
+    principal: total,
+    rate: 0,
+    term: totalMonths,
+    termUnit: 'months',
+    freq: 'monthly',
+    rateType: 'monthly',
+    interestMethod: 'addon',
+    payment: fmt(monthly),
+    total: fmt(total),
+    interest: '₱0',
+    type: 'installment',
+    endDate,
+    schedule,
+    paidCount: paid,
+    paymentHistory: [],
+    savedAt: new Date().toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'}),
+    _hulogId: hulogId  // link back to hulog record
+  });
+  try { localStorage.setItem('fk-loans', JSON.stringify(savedLoans)); } catch(e){}
+
   closeModal('add-hulog');
   ['h-name','h-store','h-total','h-monthly'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('h-paid').value='0';
-  renderHulogs(); renderDashboard(); saveLocal();
-  toast('💾 Payment plan saved!');
+  renderHulogs(); renderLoanTracker(); renderDashboard(); saveLocal();
+  toast('💾 Payment plan saved! Visible na sa Loan Tracker 💳');
 }
 
 // ══════════════════════════════════════════════
@@ -3647,11 +3694,17 @@ function renderLoanTracker() {
   const list    = document.getElementById('loan-tracker-list');
   if (!list) return;
 
+  // Always show the section — show empty state if no loans yet
+  if (section) section.style.display = 'block';
   if (!savedLoans.length) {
-    if (section) section.style.display = 'none';
+    list.innerHTML = `<div style="text-align:center;padding:24px 16px;color:var(--mut2)">
+      <div style="font-size:36px;margin-bottom:10px">🏦</div>
+      <div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:6px">Walang loan tracker pa</div>
+      <div style="font-size:12px;margin-bottom:14px">I-add ang payment plan gamit ang <strong>+</strong> button sa taas, o gumamit ng Loan Calculator.</div>
+      <button onclick="openScreen('loans')" style="padding:10px 20px;background:var(--acc);color:var(--bg);border:none;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif">🏦 Open Loan Calculator</button>
+    </div>`;
     return;
   }
-  if (section) section.style.display = 'block';
 
   const now   = new Date();
   const today = now.toISOString().split('T')[0];
