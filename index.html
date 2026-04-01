@@ -565,6 +565,10 @@ h1, h2, h3, .section-title-syne { font-family: 'Syne', sans-serif !important; }
       <div class="logo-txt">Formula<span style="color:#F5D070">Ko</span><span class="logo-product"> BudgetBuddy</span></div>
     </div>
     <div class="hdr-acts">
+      <div class="icon-btn" id="save-btn" title="Save all data" onclick="manualSave()" style="position:relative">
+        💾
+        <div id="unsaved-dot" style="position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--acc4);display:none;border:2px solid var(--bg)"></div>
+      </div>
       <div class="icon-btn" id="pdf-btn" title="Export PDF" onclick="exportPDF()">📄</div>
       <div class="icon-btn" id="sync-btn" onclick="manualSync()" title="Sync with Google Sheets">🔄</div>
       <div class="icon-btn" id="bell-btn" onclick="openDues()">🔔<div class="notif-dot" id="notif-dot"></div></div>
@@ -2342,6 +2346,7 @@ function editBudgetCat(cat, current) {
   const c = budgetData.cats.find(x=>x.cat===cat);
   if (c) c.budget = val;
   renderBudget();
+  saveLocal();
   toast('💾 Budget updated!');
 }
 
@@ -3015,13 +3020,46 @@ function deleteExpenseById(id) {
 }
 
 // ── LocalStorage persistence ─────────────────
+let _unsavedChanges = false;
+
+function markUnsaved() {
+  _unsavedChanges = true;
+  const dot = document.getElementById('unsaved-dot');
+  if (dot) dot.style.display = 'block';
+}
+
+function manualSave() {
+  saveLocal();
+  try { localStorage.setItem('fk-loans', JSON.stringify(savedLoans)); } catch(e) {}
+  _unsavedChanges = false;
+  const dot = document.getElementById('unsaved-dot');
+  if (dot) dot.style.display = 'none';
+  const btn = document.getElementById('save-btn');
+  if (btn) {
+    btn.textContent = '✅';
+    btn.style.background = 'rgba(34,196,131,0.15)';
+    btn.style.borderColor = 'var(--acc)';
+    setTimeout(() => {
+      btn.textContent = '💾';
+      btn.style.background = '';
+      btn.style.borderColor = '';
+    }, 1500);
+  }
+  toast('✅ All data saved!');
+}
+
 function saveLocal() {
   try {
     localStorage.setItem('fk-debts',    JSON.stringify(debts));
     localStorage.setItem('fk-expenses', JSON.stringify(expenses));
     localStorage.setItem('fk-hulogs',   JSON.stringify(hulogs));
     localStorage.setItem('fk-budget',   JSON.stringify(budgetData));
+    localStorage.setItem('fk-loans',    JSON.stringify(savedLoans));
   } catch(e) { console.warn('Save failed:', e); }
+  // hide dot on any auto-save too
+  _unsavedChanges = false;
+  const dot = document.getElementById('unsaved-dot');
+  if (dot) dot.style.display = 'none';
 }
 
 function loadLocal() {
