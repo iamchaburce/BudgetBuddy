@@ -4715,10 +4715,10 @@ function applyRepair() {
   const id      = parseInt(document.getElementById('repair-loan-select').value);
   const newPaid = parseInt(document.getElementById('repair-paid-count').value);
   const loan    = savedLoans.find(l => l.id === id);
-  if (!loan)                        return toast('⚠️ Piliin ang loan');
+  if (!loan)                         return toast('⚠️ Piliin ang loan');
   if (isNaN(newPaid) || newPaid < 0) return toast('⚠️ Ilagay ang tamang bilang');
   const total = (loan.schedule || []).length;
-  if (newPaid > total)               return toast('⚠️ Mas malaki pa sa total (' + total + ')');
+  if (total > 0 && newPaid > total)  return toast('⚠️ Mas malaki pa sa total (' + total + ')');
 
   loan.paidCount = newPaid;
   if (_repairClearHistory) {
