@@ -565,10 +565,6 @@ h1, h2, h3, .section-title-syne { font-family: 'Syne', sans-serif !important; }
       <div class="logo-txt">Formula<span style="color:#F5D070">Ko</span><span class="logo-product"> BudgetBuddy</span></div>
     </div>
     <div class="hdr-acts">
-      <div class="icon-btn" id="save-btn" title="Save all data" onclick="manualSave()" style="position:relative">
-        💾
-        <div id="unsaved-dot" style="position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--acc4);display:none;border:2px solid var(--bg)"></div>
-      </div>
       <div class="icon-btn" id="pdf-btn" title="Export PDF" onclick="exportPDF()">📄</div>
       <div class="icon-btn" id="sync-btn" onclick="manualSync()" title="Sync with Google Sheets">🔄</div>
       <div class="icon-btn" id="bell-btn" onclick="openDues()">🔔<div class="notif-dot" id="notif-dot"></div></div>
@@ -771,10 +767,8 @@ h1, h2, h3, .section-title-syne { font-family: 'Syne', sans-serif !important; }
     </div>
     <div class="screen-body">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
-        <div class="sum-box"><div class="sum-icon">📦</div><div class="sum-val warn" id="hs-active">0</div><div class="sum-lbl">Active Plans</div></div>
-        <div class="sum-box"><div class="sum-icon">🏦</div><div class="sum-val warn" id="hs-loans-active">0</div><div class="sum-lbl">Active Loans</div></div>
-        <div class="sum-box"><div class="sum-icon">💸</div><div class="sum-val neg" id="hs-monthly">₱0</div><div class="sum-lbl">Plans/mo</div></div>
-        <div class="sum-box"><div class="sum-icon">🏦</div><div class="sum-val neg" id="hs-loans-monthly">₱0</div><div class="sum-lbl">Loans/mo</div></div>
+        <div class="sum-box"><div class="sum-icon">📦</div><div class="sum-val warn" id="hs-active">0</div><div class="sum-lbl">Active</div></div>
+        <div class="sum-box"><div class="sum-icon">💸</div><div class="sum-val neg" id="hs-monthly">₱0</div><div class="sum-lbl">Monthly</div></div>
         <div class="sum-box"><div class="sum-icon">⚠️</div><div class="sum-val warn" id="hs-due">₱0</div><div class="sum-lbl">Due This Month</div></div>
         <div class="sum-box"><div class="sum-icon">✅</div><div class="sum-val pos" id="hs-done">0</div><div class="sum-lbl">Completed</div></div>
       </div>
@@ -791,8 +785,7 @@ h1, h2, h3, .section-title-syne { font-family: 'Syne', sans-serif !important; }
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:6px;flex-wrap:wrap">
           <div class="sec-title" style="margin:0">🏦 Loan Payment Tracker</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <button onclick="fixDuplicatePayments()" style="font-size:11px;padding:5px 12px;background:rgba(224,123,138,.15);color:var(--acc4);border:1px solid rgba(224,123,138,.3);border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:700;cursor:pointer" title="Remove duplicate payment records">🧹 Fix Duplicates</button>
-            <button onclick="openRepairModal()" style="font-size:11px;padding:5px 12px;background:rgba(245,208,112,.15);color:var(--acc3);border:1px solid rgba(245,208,112,.3);border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:700;cursor:pointer" title="Fix wrong payment count">🔧 Repair Loan</button>
+            <button onclick="openRepairModal()" style="font-size:11px;padding:5px 12px;background:rgba(245,208,112,.15);color:var(--acc3);border:1px solid rgba(245,208,112,.3);border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:700;cursor:pointer">🔧 Repair</button>
             <button onclick="openScreen('loans')" style="font-size:11px;padding:5px 12px;background:var(--acc);color:var(--bg);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:700;cursor:pointer">+ New Loan</button>
           </div>
         </div>
@@ -945,29 +938,25 @@ h1, h2, h3, .section-title-syne { font-family: 'Syne', sans-serif !important; }
   <div class="overlay" id="modal-repair-loan">
     <div class="sheet" onclick="event.stopPropagation()">
       <div class="sheet-handle"></div>
-      <div class="sheet-title">🔧 Repair Loan Data</div>
+      <div class="sheet-title">🔧 Repair Loan</div>
       <div style="font-size:12px;color:var(--mut2);margin-bottom:16px;line-height:1.6;padding:10px 12px;background:var(--surf2);border-radius:12px">
-        ⚠️ Gamitin ito para i-correct ang mali-mali na payment count. Pipiliin mo ang loan at ilalagay ang tamang bilang ng payments na nagawa na.
+        I-correct ang mali-mali na payment count. Ilagay ang tamang bilang ng payments na nagawa na (hindi kasama ang skips).
       </div>
       <div class="field-grp">
         <div class="field-lbl">Piliin ang Loan</div>
         <select class="field-in" id="repair-loan-select" onchange="onRepairLoanSelect()"></select>
       </div>
-      <div id="repair-loan-info" style="display:none;margin-bottom:16px;padding:12px;background:var(--surf2);border-radius:12px;font-size:12px">
-        <div style="margin-bottom:8px;font-weight:700;color:var(--txt)" id="repair-loan-name"></div>
-        <div style="color:var(--mut2)" id="repair-loan-meta"></div>
-      </div>
+      <div id="repair-loan-info" style="display:none;margin-bottom:14px;padding:10px 12px;background:var(--surf2);border-radius:12px;font-size:12px;color:var(--mut2);line-height:1.6"></div>
       <div class="field-grp">
-        <div class="field-lbl">Ilang months na ang nabayad? <span style="color:var(--mut2)">(normal + late, hindi kasama skip)</span></div>
-        <input class="field-in" type="number" id="repair-paid-count" placeholder="e.g. 6" min="0" inputmode="numeric">
+        <div class="field-lbl">Ilang payments ang nagawa na? (normal/late only)</div>
+        <input class="field-in" type="number" id="repair-paid-count" placeholder="e.g. 13" min="0" inputmode="numeric">
       </div>
       <div class="field-grp">
         <div class="field-lbl">I-clear ang Payment History?</div>
         <div style="display:flex;gap:8px">
           <button id="repair-clear-yes" onclick="selRepairClear(true)" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--bdr);background:none;color:var(--mut2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer">✅ Yes, i-clear</button>
-          <button id="repair-clear-no" onclick="selRepairClear(false)" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--acc);background:rgba(34,196,131,.08);color:var(--acc);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer">❌ No, keep history</button>
+          <button id="repair-clear-no" onclick="selRepairClear(false)" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--acc);background:rgba(34,196,131,.08);color:var(--acc);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer">❌ No, keep</button>
         </div>
-        <div style="font-size:11px;color:var(--mut2);margin-top:6px">Kung nag-doblo ang history or mali ang entries, i-clear na lang at mag-record ulit from scratch.</div>
       </div>
       <button class="submit-btn" onclick="applyRepair()">🔧 Apply Repair</button>
     </div>
@@ -1698,11 +1687,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   } catch(e) {}
 
-  // Ensure paymentHistory array exists on all loans
-  savedLoans.forEach(loan => {
-    if (!loan.paymentHistory) loan.paymentHistory = [];
-  });
-
   // Names already loaded above from localStorage — now render with correct names
   renderGreeting();
 
@@ -1761,7 +1745,7 @@ function renderAll() {
 // ══════════════════════════════════════════════
 function openScreen(name) {
   document.getElementById('screen-'+name).classList.add('open');
-  if (name === 'loans') { initLoanYearDropdown(); renderSavedLoans(); }
+  if (name === 'loans') initLoanYearDropdown();
   if (name === 'hulog') renderLoanTracker();
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   const navEl = document.getElementById('nav-'+name);
@@ -2249,59 +2233,12 @@ function saveHulog() {
   if (!monthly) return toast('⚠️ Enter monthly payment');
   if (!due)     return toast('⚠️ Pick a due date');
   const totalMonths = Math.round(total/monthly);
-  const hulogId = _hulogId++;
-  hulogs.unshift({id:hulogId,type:hulogType,name,store:store||'—',total,monthly,paidMonths:paid,totalMonths,nextDue:due,done:paid>=totalMonths});
-
-  // ── ALSO add to Loan Payment Tracker so "Record Payment" works ──
-  // Build a monthly payment schedule starting from the due date
-  const schedule = [];
-  const dueDate  = new Date(due);
-  for (let i = 0; i < totalMonths; i++) {
-    const d = new Date(dueDate);
-    d.setMonth(d.getMonth() + i);
-    const lbl = d.toLocaleDateString('en-PH', {month:'short', year:'numeric'});
-    schedule.push({
-      label: 'Month ' + (i + 1) + ' — ' + lbl,
-      payment: monthly,
-      principal: monthly,
-      interest: 0,
-      balance: Math.max(0, total - monthly * (i + 1))
-    });
-  }
-  // Compute end date
-  const endD = new Date(dueDate);
-  endD.setMonth(endD.getMonth() + totalMonths - 1);
-  const endDate = endD.toLocaleDateString('en-PH', {month:'short', year:'numeric'});
-
-  const loanLabel = name + (store && store !== '—' ? ' — ' + store : '');
-  savedLoans.unshift({
-    id: _loanId++,
-    label: loanLabel,
-    principal: total,
-    rate: 0,
-    term: totalMonths,
-    termUnit: 'months',
-    freq: 'monthly',
-    rateType: 'monthly',
-    interestMethod: 'addon',
-    payment: fmt(monthly),
-    total: fmt(total),
-    interest: '₱0',
-    type: 'installment',
-    endDate,
-    schedule,
-    paidCount: paid,
-    paymentHistory: [],
-    savedAt: new Date().toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'}),
-    _hulogId: hulogId  // link back to hulog record
-  });
-  try { localStorage.setItem('fk-loans', JSON.stringify(savedLoans)); } catch(e){}
-
+  hulogs.unshift({id:_hulogId++,type:hulogType,name,store:store||'—',total,monthly,paidMonths:paid,totalMonths,nextDue:due,done:paid>=totalMonths});
   closeModal('add-hulog');
   ['h-name','h-store','h-total','h-monthly'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('h-paid').value='0';
-  renderHulogs(); renderLoanTracker(); renderDashboard(); saveLocal();
-  toast('💾 Payment plan saved! Visible na sa Loan Tracker 💳');
+  renderHulogs(); renderDashboard(); saveLocal();
+  toast('💾 Payment plan saved!');
 }
 
 // ══════════════════════════════════════════════
@@ -2389,7 +2326,6 @@ function editBudgetCat(cat, current) {
   const c = budgetData.cats.find(x=>x.cat===cat);
   if (c) c.budget = val;
   renderBudget();
-  saveLocal();
   toast('💾 Budget updated!');
 }
 
@@ -3063,46 +2999,13 @@ function deleteExpenseById(id) {
 }
 
 // ── LocalStorage persistence ─────────────────
-let _unsavedChanges = false;
-
-function markUnsaved() {
-  _unsavedChanges = true;
-  const dot = document.getElementById('unsaved-dot');
-  if (dot) dot.style.display = 'block';
-}
-
-function manualSave() {
-  saveLocal();
-  try { localStorage.setItem('fk-loans', JSON.stringify(savedLoans)); } catch(e) {}
-  _unsavedChanges = false;
-  const dot = document.getElementById('unsaved-dot');
-  if (dot) dot.style.display = 'none';
-  const btn = document.getElementById('save-btn');
-  if (btn) {
-    btn.textContent = '✅';
-    btn.style.background = 'rgba(34,196,131,0.15)';
-    btn.style.borderColor = 'var(--acc)';
-    setTimeout(() => {
-      btn.textContent = '💾';
-      btn.style.background = '';
-      btn.style.borderColor = '';
-    }, 1500);
-  }
-  toast('✅ All data saved!');
-}
-
 function saveLocal() {
   try {
     localStorage.setItem('fk-debts',    JSON.stringify(debts));
     localStorage.setItem('fk-expenses', JSON.stringify(expenses));
     localStorage.setItem('fk-hulogs',   JSON.stringify(hulogs));
     localStorage.setItem('fk-budget',   JSON.stringify(budgetData));
-    localStorage.setItem('fk-loans',    JSON.stringify(savedLoans));
   } catch(e) { console.warn('Save failed:', e); }
-  // hide dot on any auto-save too
-  _unsavedChanges = false;
-  const dot = document.getElementById('unsaved-dot');
-  if (dot) dot.style.display = 'none';
 }
 
 function loadLocal() {
@@ -3530,17 +3433,8 @@ function renderSavedLoans() {
   const list     = document.getElementById('saved-loans-list');
   const countEl  = document.getElementById('saved-loans-count');
   if (!list) return;
-  // Always show section — show empty state if nothing saved
+  if (!savedLoans.length) { if (section) section.style.display = 'none'; return; }
   if (section) section.style.display = 'block';
-  if (!savedLoans.length) {
-    list.innerHTML = `<div style="text-align:center;padding:20px;color:var(--mut2);font-size:12px">
-      <div style="font-size:28px;margin-bottom:8px">📋</div>
-      <div style="font-weight:700;color:var(--txt);margin-bottom:4px">Walang saved loans pa</div>
-      <div>I-compute ang loan tapos i-tap ang 💾 para i-save.</div>
-    </div>`;
-    if (countEl) countEl.textContent = '0 saved';
-    return;
-  }
   if (countEl) countEl.textContent = savedLoans.length + ' saved';
 
   list.innerHTML = savedLoans.map(l => {
@@ -3780,78 +3674,37 @@ function renderLoanTracker() {
     }
   } catch(e) {}
 
-  // Ensure paymentHistory exists
-  savedLoans.forEach(loan => { if (!loan.paymentHistory) loan.paymentHistory = []; });
-
-  // ── Update loan summary boxes ──
-  const activeLoans  = savedLoans.filter(l => {
-    const history = l.paymentHistory || [];
-    const paidCount = history.length > 0
-      ? history.filter(h => h.type === 'normal' || h.type === 'late').length
-      : (l.paidCount || 0);
-    return (l.schedule || []).length > 0 && paidCount < (l.schedule || []).length;
-  });
-  const doneLoans    = savedLoans.filter(l => {
-    const history = l.paymentHistory || [];
-    const paidCount = history.length > 0
-      ? history.filter(h => h.type === 'normal' || h.type === 'late').length
-      : (l.paidCount || 0);
-    const total = (l.schedule || []).length;
-    return total > 0 && paidCount >= total;
-  });
-  const monthlyLoans = activeLoans.reduce((s, l) => s + (parseFloat(l.payment?.replace(/[₱,]/g,'')) || 0), 0);
-
-  const elLA = document.getElementById('hs-loans-active');
-  const elLM = document.getElementById('hs-loans-monthly');
-  const elDone = document.getElementById('hs-done');
-  if (elLA)   elLA.textContent   = activeLoans.length;
-  if (elLM)   elLM.textContent   = fmt(monthlyLoans);
-  // Update done count to include both hulogs and loans
-  if (elDone) elDone.textContent = doneLoans.length;
-
   const section = document.getElementById('loan-payment-tracker');
   const list    = document.getElementById('loan-tracker-list');
   if (!list) return;
 
-  // Always show the section — show empty state if no loans yet
-  if (section) section.style.display = 'block';
   if (!savedLoans.length) {
-    list.innerHTML = `<div style="text-align:center;padding:24px 16px;color:var(--mut2)">
-      <div style="font-size:36px;margin-bottom:10px">🏦</div>
-      <div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:6px">Walang loan tracker pa</div>
-      <div style="font-size:12px;margin-bottom:14px">I-add ang payment plan gamit ang <strong>+</strong> button sa taas, o gumamit ng Loan Calculator.</div>
-      <button onclick="openScreen('loans')" style="padding:10px 20px;background:var(--acc);color:var(--bg);border:none;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif">🏦 Open Loan Calculator</button>
-    </div>`;
+    if (section) section.style.display = 'none';
     return;
   }
+  if (section) section.style.display = 'block';
 
   const now   = new Date();
   const today = now.toISOString().split('T')[0];
 
   list.innerHTML = savedLoans.map(loan => {
     const schedule     = loan.schedule || [];
+    const paidCount    = loan.paidCount || 0;
     const totalPeriods = schedule.length;
     const history      = loan.paymentHistory || [];
 
-    // loan.paidCount = single source of truth: how far into schedule (all types processed)
-    // recordPayment always sets this to processedCount+1 after each record
-    // repair tool sets this directly
-    const processedCount = loan.paidCount || 0;
-
-    // fullyPaidCount = normal+late only, for progress/isDone display
+    // fullyPaidCount = only normal/late payments — skips/partials don't count as done
     const fullyPaidCount = history.length > 0
       ? history.filter(h => h.type === 'normal' || h.type === 'late').length
-      : processedCount;  // fallback for old loans with no history
+      : paidCount;
 
     const pct       = totalPeriods > 0 ? Math.round(fullyPaidCount / totalPeriods * 100) : 0;
     const remaining = totalPeriods - fullyPaidCount;
+    const isDone    = totalPeriods > 0 && fullyPaidCount >= totalPeriods;
 
-    // isDone ONLY when ALL periods have normal/late payment — skips never count as done
-    const isDone = totalPeriods > 0 && fullyPaidCount >= totalPeriods;
-
-    // Next payment info from schedule — use processedCount so skips/partials are included
-    const nextPayment  = schedule[processedCount] || null;
-    const lastPayment  = processedCount > 0 ? schedule[processedCount - 1] : null;
+    // Next payment info from schedule
+    const nextPayment  = schedule[paidCount] || null;
+    const lastPayment  = paidCount > 0 ? schedule[paidCount - 1] : null;
 
     // Check if paid this month
     const thisMonth   = now.toLocaleDateString('en-PH', {month:'short', year:'numeric'});
@@ -3960,7 +3813,7 @@ function renderLoanTracker() {
       <div id="loan-history-${loan.id}" style="display:none;padding:0 16px 12px">
         <div style="font-size:11px;font-weight:800;color:var(--mut2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Payment History</div>
         ${(loan.paymentHistory && loan.paymentHistory.length > 0)
-          ? [...loan.paymentHistory].reverse().map((h, i) => {
+          ? [...loan.paymentHistory].reverse().map(h => {
               const typeIcon  = h.type==='normal'?'✅':h.type==='late'?'⏰':h.type==='partial'?'💸':'⏭️';
               const typeColor = h.type==='normal'?'var(--acc)':h.type==='late'?'var(--acc3)':h.type==='partial'?'var(--acc2)':'var(--acc4)';
               const extraInfo = h.lateFee>0 ? ' +₱'+h.lateFee.toLocaleString()+' fee' :
@@ -4020,29 +3873,10 @@ function markLoanPaid(id) {
 
 function undoLoanPaid(id) {
   const loan = savedLoans.find(l => l.id === id);
-  if (!loan || !(loan.paidCount > 0)) return toast('⚠️ Walang payment na maa-undo');
-
-  // Decrement processedCount
-  loan.paidCount = Math.max(0, (loan.paidCount || 0) - 1);
-
-  // Pop last history entry if exists
-  let removed = null;
-  if (loan.paymentHistory && loan.paymentHistory.length > 0) {
-    removed = loan.paymentHistory.pop();
-  }
-
-  // Recalculate carryover from remaining history
-  let carryover = 0;
-  (loan.paymentHistory || []).forEach(ph => {
-    if (ph.type === 'skip' || ph.type === 'partial') carryover = ph.carryoverAdded || 0;
-    else if (ph.type === 'normal' || ph.type === 'late') carryover = 0;
-  });
-  loan.carryoverBalance = carryover;
-  loan.totalLateFees    = (loan.paymentHistory || []).reduce((s, h) => s + (h.lateFee || 0), 0);
-  const fullyPaid       = (loan.paymentHistory || []).filter(h => h.type === 'normal' || h.type === 'late').length;
-  if (fullyPaid === 0) loan.lastPaidMonth = null;
-
-  toast('↩ Nai-undo: ' + (removed?.label || 'last payment') + ' — back to period ' + loan.paidCount);
+  if (!loan || !loan.paidCount) return toast('⚠️ No payment to undo');
+  loan.paidCount--;
+  loan.lastPaidMonth = loan.paidCount > 0 ? loan.lastPaidMonth : null;
+  toast('↩ Payment undone — back to ' + loan.paidCount + ' payments');
   try { localStorage.setItem('fk-loans', JSON.stringify(savedLoans)); } catch(e) {}
   renderLoanTracker();
 }
@@ -4077,13 +3911,9 @@ function openPaymentModal(loanId) {
   const loan = savedLoans.find(l => l.id === loanId);
   if (!loan) return;
 
-  const schedule       = loan.schedule || [];
-  // loan.paidCount is the single source of truth for next period index
-  const processedCount = loan.paidCount || 0;
-  if (processedCount >= schedule.length && schedule.length > 0) {
-    return toast('⚠️ Lahat ng periods ay naka-record na. Gamitin ang ↩ undo para mag-correct.');
-  }
-  const nextSchedule = schedule[processedCount];
+  const paidCount    = loan.paidCount || 0;
+  const schedule     = loan.schedule  || [];
+  const nextSchedule = schedule[paidCount];
   const carryover    = loan.carryoverBalance || 0;
   const carryInt     = Math.round(carryover * 0.05);
   const regularAmt   = nextSchedule ? nextSchedule.payment : parseFloat(loan.payment?.replace(/[₱,]/g,'')) || 0;
@@ -4091,7 +3921,7 @@ function openPaymentModal(loanId) {
 
   // Set modal title
   document.getElementById('pmr-title').textContent =
-    'Record Payment — ' + (nextSchedule?.label || 'Period ' + (processedCount+1));
+    'Record Payment — ' + (nextSchedule?.label || 'Period ' + (paidCount+1));
   document.getElementById('pmr-loan-id').value = loanId;
   document.getElementById('pmr-date').value    = new Date().toISOString().split('T')[0];
   document.getElementById('pmr-notes').value   = '';
@@ -4163,11 +3993,9 @@ function selPenaltyType(type, el) {
 function updatePaymentTotal() {
   const loan      = savedLoans.find(l => l.id === _currentLoanId);
   if (!loan) return;
-  const history   = loan.paymentHistory || [];
-  const schedule  = loan.schedule || [];
-  // loan.paidCount = single source of truth
-  const processedCount = loan.paidCount || 0;
-  const next      = schedule[processedCount];
+  const paidCount = loan.paidCount  || 0;
+  const schedule  = loan.schedule   || [];
+  const next      = schedule[paidCount];
   const carryover = loan.carryoverBalance || 0;
   const carryInt  = Math.round(carryover * 0.05);
   const regular   = next ? next.payment : parseFloat(loan.payment?.replace(/[₱,]/g,'')) || 0;
@@ -4206,50 +4034,40 @@ function recordPayment() {
   const loan = savedLoans.find(l => l.id === _currentLoanId);
   if (!loan) return;
 
-  const schedule       = loan.schedule || [];
-  const history        = loan.paymentHistory || [];
-  // loan.paidCount = single source of truth for next period index
-  const processedCount = loan.paidCount || 0;
-  // fullyPaidCount = normal+late only
-  const paidCount      = history.length > 0
-    ? history.filter(h => h.type === 'normal' || h.type === 'late').length
-    : processedCount;
-  const next           = schedule[processedCount];
-  const carryover      = loan.carryoverBalance || 0;
-  const carryInt       = Math.round(carryover * 0.05);
-  const regular        = next ? next.payment : parseFloat(loan.payment?.replace(/[₱,]/g,'')) || 0;
-  const totalDue       = regular + carryover + carryInt;
-  const date           = document.getElementById('pmr-date').value;
-  const notes          = document.getElementById('pmr-notes').value.trim();
-  const now            = new Date();
-  const thisMonth      = now.toLocaleDateString('en-PH', {month:'short', year:'numeric'});
-
-  // ── DUPLICATE CHECK ──────────────────────────────────────────
-  // Prevent recording the same period twice (non-partial/skip payments)
-  if (_currentPaymentType === 'normal' || _currentPaymentType === 'late') {
-    const alreadyRecorded = (loan.paymentHistory || []).some(
-      h => h.period === processedCount + 1 && (h.type === 'normal' || h.type === 'late')
-    );
-    if (alreadyRecorded) {
-      return toast('⚠️ Period ' + (processedCount + 1) + ' ay naka-record na! I-check ang Payment History.');
-    }
-    if (loan.lastPaidMonth === thisMonth && !carryover) {
-      const confirmDup = confirm('⚠️ May nakitang payment na para sa ' + thisMonth + '. Sigurado kang nag-doblo? I-cancel para huwag mag-duplicate.');
-      if (!confirmDup) return;
-    }
-  }
-  // ────────────────────────────────────────────────────────────
+  const paidCount = loan.paidCount  || 0;
+  const schedule  = loan.schedule   || [];
+  const next      = schedule[paidCount];
+  const carryover = loan.carryoverBalance || 0;
+  const carryInt  = Math.round(carryover * 0.05);
+  const regular   = next ? next.payment : parseFloat(loan.payment?.replace(/[₱,]/g,'')) || 0;
+  const totalDue  = regular + carryover + carryInt;
+  const date      = document.getElementById('pmr-date').value;
+  const notes     = document.getElementById('pmr-notes').value.trim();
+  const now       = new Date();
+  const thisMonth = now.toLocaleDateString('en-PH', {month:'short', year:'numeric'});
 
   // Initialize history array
   if (!loan.paymentHistory) loan.paymentHistory = [];
 
+  // Duplicate check — prevent recording same period twice
+  if (_currentPaymentType === 'normal' || _currentPaymentType === 'late') {
+    const alreadyRecorded = loan.paymentHistory.some(
+      h => h.period === paidCount + 1 && (h.type === 'normal' || h.type === 'late')
+    );
+    if (alreadyRecorded) {
+      return toast('⚠️ Period ' + (paidCount + 1) + ' ay naka-record na!');
+    }
+  }
+
+
   if (_currentPaymentType === 'normal') {
-    loan.paidCount        = paidCount + 1;
-    loan.lastPaidMonth    = thisMonth;
+    // Full payment
+    loan.paidCount       = paidCount + 1;
+    loan.lastPaidMonth   = thisMonth;
     loan.carryoverBalance = 0;
     loan.paymentHistory.push({
-      period: processedCount + 1,
-      label:  next?.label || 'Period ' + (processedCount+1),
+      period: paidCount + 1,
+      label:  next?.label || 'Period ' + (paidCount+1),
       type:   'normal',
       amount: totalDue,
       date, notes,
@@ -4267,13 +4085,13 @@ function recordPayment() {
     else if (_currentPenaltyType === 'pct') lateFee = pctFee;
     else lateFee = Math.min(fixedFee, pctFee);
 
-    loan.paidCount        = paidCount + 1;
-    loan.lastPaidMonth    = thisMonth;
+    loan.paidCount       = paidCount + 1;
+    loan.lastPaidMonth   = thisMonth;
     loan.carryoverBalance = 0;
     loan.totalLateFees    = (loan.totalLateFees || 0) + lateFee;
     loan.paymentHistory.push({
-      period: processedCount + 1,
-      label:  next?.label || 'Period ' + (processedCount+1),
+      period: paidCount + 1,
+      label:  next?.label || 'Period ' + (paidCount+1),
       type:   'late',
       amount: totalDue + lateFee,
       lateFee,
@@ -4285,14 +4103,14 @@ function recordPayment() {
   } else if (_currentPaymentType === 'partial') {
     const partialAmt = parseFloat(document.getElementById('pmr-partial-amt').value) || 0;
     const unpaid     = Math.max(0, totalDue - partialAmt);
-    const newCarry   = Math.round(unpaid * 1.05);
+    const newCarry   = Math.round(unpaid * 1.05); // add 5% interest on unpaid
 
     loan.lastPaidMonth    = thisMonth;
     loan.carryoverBalance = newCarry;
-    // paidCount does NOT advance — period not fully paid
+    // Don't advance paidCount — period not complete
     loan.paymentHistory.push({
-      period:  processedCount + 1,
-      label:   (next?.label || 'Period ' + (processedCount+1)) + ' (Partial)',
+      period:  paidCount + 1,
+      label:   (next?.label || 'Period ' + (paidCount+1)) + ' (Partial)',
       type:    'partial',
       amount:  partialAmt,
       unpaid,
@@ -4308,10 +4126,9 @@ function recordPayment() {
 
     loan.carryoverBalance = newCarry;
     loan.totalSkipped     = (loan.totalSkipped || 0) + 1;
-    // paidCount does NOT advance — period skipped
     loan.paymentHistory.push({
-      period:  processedCount + 1,
-      label:   (next?.label || 'Period ' + (processedCount+1)) + ' (Skipped)',
+      period:  paidCount + 1,
+      label:   (next?.label || 'Period ' + (paidCount+1)) + ' (Skipped)',
       type:    'skip',
       amount:  0,
       unpaid:  regular,
@@ -4324,19 +4141,15 @@ function recordPayment() {
     toast('⏭️ Month skipped — ₱' + newCarry.toLocaleString() + ' carries over (incl. 5% interest)');
   }
 
-  // Update loan.paidCount to reflect new processedCount (for backward compat with old loans)
-  loan.paidCount = processedCount + 1;
-
-  // Save — only show fully paid if ALL periods are normal/late
-  const newFullyPaid = (loan.paymentHistory || []).filter(h => h.type === 'normal' || h.type === 'late').length;
-  if (newFullyPaid >= schedule.length && schedule.length > 0) {
-    setTimeout(() => toast('🎉 ' + loan.label + ' — Fully Paid! Congratulations!'), 300);
+  // Save
+  if (loan.paidCount >= schedule.length && schedule.length > 0 && _currentPaymentType !== 'skip') {
+    toast('🎉 ' + loan.label + ' — Fully Paid! Congratulations!');
   }
 
   try { localStorage.setItem('fk-loans', JSON.stringify(savedLoans)); } catch(e) {}
   document.getElementById('modal-payment-record').classList.remove('open');
   renderLoanTracker();
-  renderSavedLoans();
+  renderSavedLoans(); // also update loan calculator saved section
 }
 
 
@@ -4399,134 +4212,39 @@ function saveEditPaymentHistory() {
   toast('✅ Payment record updated!');
 }
 
-// ── REPAIR LOAN MODAL ────────────────────────
-let _repairClearHistory = false;
-
-function openRepairModal() {
-  _repairClearHistory = false;
-  const sel = document.getElementById('repair-loan-select');
-  sel.innerHTML = '<option value="">— Piliin ang loan —</option>' +
-    savedLoans.map(l => `<option value="${l.id}">${l.label}</option>`).join('');
-  document.getElementById('repair-paid-count').value = '';
-  document.getElementById('repair-loan-info').style.display = 'none';
-  selRepairClear(false);
-  document.getElementById('modal-repair-loan').classList.add('open');
-}
-
-function onRepairLoanSelect() {
-  const id   = parseInt(document.getElementById('repair-loan-select').value);
-  const loan = savedLoans.find(l => l.id === id);
-  const info = document.getElementById('repair-loan-info');
-  if (!loan) { info.style.display = 'none'; return; }
-  const history     = loan.paymentHistory || [];
-  const paidCount   = loan.paidCount || 0;
-  const totalPeriods = (loan.schedule || []).length;
-  const histPaid    = history.filter(h => h.type === 'normal' || h.type === 'late').length;
-  const histSkips   = history.filter(h => h.type === 'skip').length;
-  document.getElementById('repair-loan-name').textContent = loan.label;
-  document.getElementById('repair-loan-meta').innerHTML =
-    `Schedule: ${totalPeriods} periods total<br>` +
-    `Stored paidCount: ${paidCount}<br>` +
-    `History entries: ${history.length} (${histPaid} paid, ${histSkips} skip/partial)`;
-  info.style.display = 'block';
-  // Pre-fill with history-derived count as suggestion
-  document.getElementById('repair-paid-count').value = histPaid || paidCount;
-}
-
-function selRepairClear(val) {
-  _repairClearHistory = val;
-  const yes = document.getElementById('repair-clear-yes');
-  const no  = document.getElementById('repair-clear-no');
-  if (yes) { yes.style.borderColor = val ? 'var(--acc)' : 'var(--bdr)'; yes.style.background = val ? 'rgba(34,196,131,.08)' : 'none'; yes.style.color = val ? 'var(--acc)' : 'var(--mut2)'; }
-  if (no)  { no.style.borderColor  = val ? 'var(--bdr)' : 'var(--acc)'; no.style.background  = val ? 'none' : 'rgba(34,196,131,.08)'; no.style.color  = val ? 'var(--mut2)' : 'var(--acc)'; }
-}
-
-function applyRepair() {
-  const id         = parseInt(document.getElementById('repair-loan-select').value);
-  const newPaid    = parseInt(document.getElementById('repair-paid-count').value);
-  const loan       = savedLoans.find(l => l.id === id);
-  if (!loan)       return toast('⚠️ Piliin ang loan');
-  if (isNaN(newPaid) || newPaid < 0) return toast('⚠️ Ilagay ang tamang bilang');
-  const totalPeriods = (loan.schedule || []).length;
-  if (newPaid > totalPeriods) return toast('⚠️ Mas malaki pa sa total periods (' + totalPeriods + ')');
-
-  loan.paidCount = newPaid;
-  if (_repairClearHistory) {
-    loan.paymentHistory   = [];
-    loan.carryoverBalance = 0;
-    loan.totalLateFees    = 0;
-    loan.totalSkipped     = 0;
-    loan.lastPaidMonth    = null;
-  }
-  try { localStorage.setItem('fk-loans', JSON.stringify(savedLoans)); } catch(e) {}
-  document.getElementById('modal-repair-loan').classList.remove('open');
-  renderLoanTracker();
-  toast('✅ Na-repair! ' + loan.label + ' → ' + newPaid + ' payments' + (_repairClearHistory ? ', history cleared' : ''));
-}
-
-function fixDuplicatePayments() {
-  let totalRemoved = 0;
-
-  savedLoans.forEach(loan => {
-    if (!loan.paymentHistory || !loan.paymentHistory.length) return;
-
-    // Find and remove duplicate periods — keep only the FIRST record per period number
-    const seen = new Set();
-    const original = loan.paymentHistory.length;
-    loan.paymentHistory = loan.paymentHistory.filter(h => {
-      // For normal/late payments, deduplicate by period number
-      if (h.type === 'normal' || h.type === 'late') {
-        const key = 'p' + h.period;
-        if (seen.has(key)) return false; // duplicate — remove
-        seen.add(key);
-      }
-      return true;
-    });
-
-    const removed = original - loan.paymentHistory.length;
-    totalRemoved += removed;
-
-    if (removed > 0) {
-      // Recalculate paidCount from clean history
-      loan.paidCount = loan.paymentHistory.filter(
-        h => h.type === 'normal' || h.type === 'late'
-      ).length;
-      // Recalculate late fees
-      loan.totalLateFees = loan.paymentHistory.reduce((s, h) => s + (h.lateFee || 0), 0);
-    }
-  });
-
-  try { localStorage.setItem('fk-loans', JSON.stringify(savedLoans)); } catch(e) {}
-  renderLoanTracker();
-
-  if (totalRemoved > 0) {
-    toast('🧹 ' + totalRemoved + ' duplicate record' + (totalRemoved > 1 ? 's' : '') + ' na-remove!');
-  } else {
-    toast('✅ Walang duplicates na nahanap.');
-  }
-}
-
 function deletePaymentHistory(loanId, histIdx) {
   if (!confirm('Delete this payment record? This will also adjust the payment count.')) return;
   const loan = savedLoans.find(l => l.id === loanId);
   if (!loan || !loan.paymentHistory) return;
 
+  const h       = loan.paymentHistory[histIdx];
+  const wasType = h?.type;
+
   // Remove from history
   loan.paymentHistory.splice(histIdx, 1);
 
-  // paidCount = history length (processedCount after deletion)
-  loan.paidCount = loan.paymentHistory.length;
+  // Adjust paidCount if it was a completed payment
+  if (wasType === 'normal' || wasType === 'late') {
+    loan.paidCount = Math.max(0, (loan.paidCount || 0) - 1);
+  }
 
   // Recalculate total late fees
-  loan.totalLateFees = loan.paymentHistory.reduce((sum, x) => sum + (x.lateFee || 0), 0);
+  loan.totalLateFees = (loan.paymentHistory || [])
+    .reduce((sum, x) => sum + (x.lateFee || 0), 0);
 
-  // Recalculate carryover from last unresolved skip/partial
-  let carryover = 0;
-  loan.paymentHistory.forEach(ph => {
-    if (ph.type === 'skip' || ph.type === 'partial') carryover = ph.carryoverAdded || 0;
-    else if (ph.type === 'normal' || ph.type === 'late') carryover = 0;
-  });
-  loan.carryoverBalance = carryover;
+  // If deleted a skip/partial, reset carryover
+  if (wasType === 'skip' || wasType === 'partial') {
+    // Recalculate carryover from remaining history
+    let carryover = 0;
+    loan.paymentHistory.forEach(ph => {
+      if (ph.type === 'skip' || ph.type === 'partial') {
+        carryover = ph.carryoverAdded || 0;
+      } else if (ph.type === 'normal' || ph.type === 'late') {
+        carryover = 0;
+      }
+    });
+    loan.carryoverBalance = carryover;
+  }
 
   try { localStorage.setItem('fk-loans', JSON.stringify(savedLoans)); } catch(e) {}
   renderLoanTracker();
@@ -4942,6 +4660,69 @@ function saveBulkPayments() {
   toast('✅ ' + recordCount + ' payment records saved!');
 }
 
+
+// ── REPAIR LOAN ──────────────────────────────
+let _repairClearHistory = false;
+
+function openRepairModal() {
+  _repairClearHistory = false;
+  const sel = document.getElementById('repair-loan-select');
+  sel.innerHTML = '<option value="">— Piliin ang loan —</option>' +
+    savedLoans.map(l => `<option value="${l.id}">${l.label}</option>`).join('');
+  document.getElementById('repair-paid-count').value = '';
+  document.getElementById('repair-loan-info').style.display = 'none';
+  selRepairClear(false);
+  document.getElementById('modal-repair-loan').classList.add('open');
+}
+
+function onRepairLoanSelect() {
+  const id   = parseInt(document.getElementById('repair-loan-select').value);
+  const loan = savedLoans.find(l => l.id === id);
+  const info = document.getElementById('repair-loan-info');
+  if (!loan) { info.style.display = 'none'; return; }
+  const history      = loan.paymentHistory || [];
+  const total        = (loan.schedule || []).length;
+  const histPaid     = history.filter(h => h.type === 'normal' || h.type === 'late').length;
+  const histSkips    = history.filter(h => h.type === 'skip' || h.type === 'partial').length;
+  info.style.display = 'block';
+  info.innerHTML     =
+    `<strong style="color:var(--txt)">${loan.label}</strong><br>` +
+    `Total periods: ${total}<br>` +
+    `Stored paidCount: ${loan.paidCount || 0}<br>` +
+    `History: ${history.length} entries (${histPaid} paid, ${histSkips} skip/partial)`;
+  document.getElementById('repair-paid-count').value = histPaid || (loan.paidCount || 0);
+}
+
+function selRepairClear(val) {
+  _repairClearHistory = val;
+  const yes = document.getElementById('repair-clear-yes');
+  const no  = document.getElementById('repair-clear-no');
+  if (yes) { yes.style.borderColor = val ? 'var(--acc)' : 'var(--bdr)'; yes.style.background = val ? 'rgba(34,196,131,.08)' : 'none'; yes.style.color = val ? 'var(--acc)' : 'var(--mut2)'; }
+  if (no)  { no.style.borderColor  = val ? 'var(--bdr)' : 'var(--acc)'; no.style.background  = val ? 'none' : 'rgba(34,196,131,.08)'; no.style.color  = val ? 'var(--mut2)' : 'var(--acc)'; }
+}
+
+function applyRepair() {
+  const id      = parseInt(document.getElementById('repair-loan-select').value);
+  const newPaid = parseInt(document.getElementById('repair-paid-count').value);
+  const loan    = savedLoans.find(l => l.id === id);
+  if (!loan)                        return toast('⚠️ Piliin ang loan');
+  if (isNaN(newPaid) || newPaid < 0) return toast('⚠️ Ilagay ang tamang bilang');
+  const total = (loan.schedule || []).length;
+  if (newPaid > total)               return toast('⚠️ Mas malaki pa sa total (' + total + ')');
+
+  loan.paidCount = newPaid;
+  if (_repairClearHistory) {
+    loan.paymentHistory   = [];
+    loan.carryoverBalance = 0;
+    loan.totalLateFees    = 0;
+    loan.totalSkipped     = 0;
+    loan.lastPaidMonth    = null;
+  }
+  try { localStorage.setItem('fk-loans', JSON.stringify(savedLoans)); } catch(e) {}
+  document.getElementById('modal-repair-loan').classList.remove('open');
+  renderLoanTracker();
+  toast('✅ Na-repair! ' + loan.label + ' → ' + newPaid + ' payments' + (_repairClearHistory ? ' + history cleared' : ''));
+}
 
 function toast(msg) {
   const existing = document.querySelector('.toast');
