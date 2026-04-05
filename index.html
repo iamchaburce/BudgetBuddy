@@ -781,7 +781,7 @@ h1, h2, h3, .section-title-syne { font-family: 'Syne', sans-serif !important; }
       <div id="hulog-list"></div>
 
       <!-- ── LOAN PAYMENT TRACKER ── -->
-      <div id="loan-payment-tracker" style="display:none;margin-top:8px">
+      <div id="loan-payment-tracker" style="margin-top:8px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:6px;flex-wrap:wrap">
           <div class="sec-title" style="margin:0">🏦 Loan Payment Tracker</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -1187,7 +1187,7 @@ h1, h2, h3, .section-title-syne { font-family: 'Syne', sans-serif !important; }
       </div><!-- end loan-results -->
 
       <!-- Saved Loans / Payment Reference -->
-      <div id="saved-loans-section" style="display:none">
+      <div id="saved-loans-section">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;margin-bottom:10px">
           <div class="sec-title" style="margin:0">📋 Saved Loan References</div>
           <div style="font-size:11px;color:var(--mut2)" id="saved-loans-count"></div>
@@ -3433,8 +3433,12 @@ function renderSavedLoans() {
   const list     = document.getElementById('saved-loans-list');
   const countEl  = document.getElementById('saved-loans-count');
   if (!list) return;
-  if (!savedLoans.length) { if (section) section.style.display = 'none'; return; }
   if (section) section.style.display = 'block';
+  if (!savedLoans.length) {
+    if (countEl) countEl.textContent = '0 saved';
+    list.innerHTML = `<div style="padding:16px;text-align:center;font-size:12px;color:var(--mut2)">Walang saved loans pa. I-compute ang loan tapos i-tap ang 💾.</div>`;
+    return;
+  }
   if (countEl) countEl.textContent = savedLoans.length + ' saved';
 
   list.innerHTML = savedLoans.map(l => {
@@ -3678,11 +3682,17 @@ function renderLoanTracker() {
   const list    = document.getElementById('loan-tracker-list');
   if (!list) return;
 
+  // Always show the tracker section
+  if (section) section.style.display = 'block';
+
   if (!savedLoans.length) {
-    if (section) section.style.display = 'none';
+    list.innerHTML = `<div style="text-align:center;padding:20px;color:var(--mut2);font-size:13px">
+      <div style="font-size:32px;margin-bottom:8px">🏦</div>
+      <div style="font-weight:700;color:var(--txt);margin-bottom:4px">Walang loans pa</div>
+      <div>Pumunta sa Loan Calculator para mag-save ng loan.</div>
+    </div>`;
     return;
   }
-  if (section) section.style.display = 'block';
 
   const now   = new Date();
   const today = now.toISOString().split('T')[0];
